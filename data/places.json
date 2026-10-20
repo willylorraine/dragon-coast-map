@@ -1,0 +1,516 @@
+{
+  "version": 2,
+  "checked": "2026-10-20",
+  "wikiBase": "https://lore.xn--80agogbaiw1akdl8m.xn--p1ai",
+  "taplink": "https://taplink.cc/dicewilldecide",
+  "youtube": "https://www.youtube.com/@dicewilldecide",
+  "spriteSize": {
+    "braytvoter": [
+      638,
+      640
+    ],
+    "caravel": [
+      640,
+      635
+    ],
+    "cathedral": [
+      550,
+      640
+    ],
+    "compass": [
+      640,
+      625
+    ],
+    "dwarf_city": [
+      640,
+      620
+    ],
+    "dwarf_hold": [
+      627,
+      640
+    ],
+    "dwarf_village": [
+      640,
+      466
+    ],
+    "galleon": [
+      640,
+      580
+    ],
+    "hamlet": [
+      637,
+      640
+    ],
+    "harbor": [
+      627,
+      640
+    ],
+    "kraken": [
+      640,
+      605
+    ],
+    "market_town": [
+      582,
+      640
+    ],
+    "pier": [
+      567,
+      640
+    ],
+    "scroll_roller": [
+      208,
+      1400
+    ],
+    "serpent": [
+      640,
+      520
+    ],
+    "ship_inspiration": [
+      640,
+      633
+    ],
+    "village": [
+      640,
+      547
+    ],
+    "walled_town": [
+      640,
+      512
+    ],
+    "watchtower": [
+      633,
+      640
+    ]
+  },
+  "places": [
+    {
+      "slug": "drakone-more",
+      "aliases": [],
+      "kind": "sea",
+      "status": "article",
+      "group": "sea",
+      "name": "Драконье Море",
+      "label": "ДРАКОНЬЕ МОРЕ",
+      "type": "Море",
+      "text": [
+        "Так же называется приморский округ Империи Бестара, через который идут важные торговые пути.",
+        "В этом же море лежит пиратский архипелаг Конфедерации Крылатых Островов.",
+        "Имперские корабли, которые туда заходят, часто не возвращаются."
+      ],
+      "wiki": {
+        "path": "/locations/drakone-more/"
+      },
+      "related": [
+        {
+          "title": "Великая Империя «Бестара»",
+          "path": "/factions/bestara/"
+        },
+        {
+          "title": "Конфедерация Крылатых Островов",
+          "path": "/factions/konfederaciya-krylatyh-ostrovov/"
+        },
+        {
+          "title": "Политическая Обстановка в Бестаре",
+          "path": "/world/politicheskaya-obstanovka-v-bestare/"
+        },
+        {
+          "title": "Известные Земли",
+          "path": "/world/izvestnye-zemli/"
+        }
+      ],
+      "sources": [
+        "lore dwd/src/content/locations/drakone-more.md:2",
+        "lore dwd/src/content/world/izvestnye-zemli.md:14",
+        "lore dwd/src/content/locations/drakone-more.md:4, 17, 25",
+        "lore dwd/src/content/factions/konfederaciya-krylatyh-ostrovov.md:25, 27"
+      ],
+      "map": {
+        "seaLabel": true
+      }
+    },
+    {
+      "slug": "klatter-kouv",
+      "aliases": [
+        "klatr-kov"
+      ],
+      "kind": "city",
+      "status": "section",
+      "group": "north",
+      "name": "Клаттер-Коув",
+      "label": "Клаттер-Коув",
+      "type": "Портовый город",
+      "ruler": "герцог Лотар Кейлвин",
+      "text": [
+        "В самый большой город округа свозят налоги из Солэйна и других поселений.",
+        "Его порт может принимать большие корабли из Южных Королевств и Альянса Гор и Холмов.",
+        "У города прочные стены, а ещё здесь работает филиал Банка Империи."
+      ],
+      "wiki": {
+        "path": "/locations/drakone-more/",
+        "textFragment": "крупнейший и самый значимый город"
+      },
+      "related": [
+        {
+          "title": "Великая Империя «Бестара»",
+          "path": "/factions/bestara/#управление"
+        },
+        {
+          "title": "Объединённые Королевства Южных Земель",
+          "path": "/factions/obedinennye-korolevstva-yuzhnyh-zemel/"
+        },
+        {
+          "title": "Альянс Гор и Холмов",
+          "path": "/factions/alyans-gor-i-holmov/"
+        }
+      ],
+      "sources": [
+        "lore dwd/src/content/locations/drakone-more.md:20, 26"
+      ],
+      "map": {
+        "x": 1652,
+        "y": 236,
+        "sprite": "harbor",
+        "w": 215,
+        "fs": 46
+      }
+    },
+    {
+      "slug": "soleyn",
+      "aliases": [],
+      "kind": "city",
+      "status": "section",
+      "group": "north",
+      "name": "Солэйн",
+      "label": "Солэйн",
+      "type": "Портовый город",
+      "ruler": "граф Эдмунд Талсин",
+      "text": [
+        "Здесь хранят рыбу, древесину и другие товары перед отправкой в Клаттер-Коув или на материк.",
+        "Солэйн стоит без крепостных стен, зато крепкая стража охраняет товары и следит за порядком.",
+        "Граф часто уезжает в свою резиденцию, и тогда городом управляет его заместитель, дварф Грондаль Бирбак из клана Стоунскат."
+      ],
+      "wiki": {
+        "path": "/locations/drakone-more/",
+        "textFragment": "второй по величине город округа"
+      },
+      "related": [
+        {
+          "title": "Великая Империя «Бестара»",
+          "path": "/factions/bestara/#управление"
+        },
+        {
+          "title": "Дварф",
+          "path": "/races/dvarf/"
+        }
+      ],
+      "sources": [
+        "lore dwd/src/content/locations/drakone-more.md:21, 27"
+      ],
+      "map": {
+        "x": 1298,
+        "y": 266,
+        "sprite": "cathedral",
+        "w": 200,
+        "fs": 44
+      }
+    },
+    {
+      "slug": "braytvoter",
+      "aliases": [],
+      "kind": "city",
+      "status": "section",
+      "group": "north",
+      "name": "Брайтвотер",
+      "label": "Брайтвотер",
+      "type": "Городок",
+      "ruler": "барон Риккард Хэйм",
+      "text": [
+        "Из простой рыбацкой деревни Брайтвотер вырос в одного из главных поставщиков еды для побережья.",
+        "Крепостных стен у городка нет: с запада его прикрывают горы, с юга скалистый берег, а на севере города, на возвышении, стоит замок.",
+        "Каждый год здесь устраивают ярмарки и рыбные фестивали."
+      ],
+      "wiki": {
+        "path": "/locations/drakone-more/",
+        "textFragment": "небольшой и уютный городок"
+      },
+      "related": [
+        {
+          "title": "Дварф",
+          "path": "/races/dvarf/"
+        },
+        {
+          "title": "Великая Империя «Бестара»",
+          "path": "/factions/bestara/#управление"
+        }
+      ],
+      "sources": [
+        "lore dwd/src/content/locations/drakone-more.md:22, 28"
+      ],
+      "map": {
+        "x": 694,
+        "y": 344,
+        "sprite": "braytvoter",
+        "w": 185,
+        "fs": 42
+      }
+    },
+    {
+      "slug": "ingrira",
+      "aliases": [],
+      "kind": "city",
+      "status": "article",
+      "group": "mountains",
+      "name": "Ингрира",
+      "label": "Ингрира",
+      "type": "Город-крепость",
+      "ruler": "герцог Торгрим из клана Мраморный Щит, хотя на деле власти больше у городского совета",
+      "text": [
+        "Ингрира находится в самой высокой горе Известных Земель и когда-то была столицей Альянса Гор и Холмов.",
+        "Рядом с городом новые боги победили Обокс-Оба по прозвищу Принц Паразитов, и Аберрантная Война закончилась.",
+        "Века спустя город 33 года выдерживал осаду Бестары, а теперь сам производит для неё почти треть минеральных и магических ресурсов."
+      ],
+      "wiki": {
+        "path": "/locations/ingrira/"
+      },
+      "related": [
+        {
+          "title": "Битва за Ингриру",
+          "path": "/history/bitva-za-ingriru/"
+        },
+        {
+          "title": "Аберрантная Война",
+          "path": "/history/aberrantnaya-voyna/"
+        },
+        {
+          "title": "Альянс Гор и Холмов",
+          "path": "/factions/alyans-gor-i-holmov/"
+        },
+        {
+          "title": "Новые боги",
+          "path": "/gods/novye-bogi/"
+        }
+      ],
+      "sources": [
+        "lore dwd/src/content/locations/ingrira.md:2, 4, 19, 26, 28–30",
+        "lore dwd/src/content/history/bitva-za-ingriru.md:4, 21",
+        "lore dwd/src/content/history/aberrantnaya-voyna.md:18",
+        "lore dwd/src/content/history/ekspansiya-bestary.md:18"
+      ],
+      "map": {
+        "x": 572,
+        "y": 1003,
+        "sprite": "dwarf_city",
+        "w": 245,
+        "fs": 54
+      }
+    },
+    {
+      "slug": "kragor-hal",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "mountains",
+      "name": "Крагор-Хал",
+      "label": "Крагор-Хал",
+      "type": "Крепость",
+      "text": [
+        "Крагор-Хал стоит у самого берега, в восточной части южных гор. К северо-западу, через море, лежит остров Харголим."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: крепость с башнями в горах на южном берегу"
+      ],
+      "map": {
+        "x": 1818,
+        "y": 1046,
+        "sprite": "dwarf_hold",
+        "w": 205,
+        "fs": 46
+      }
+    },
+    {
+      "slug": "dasiya",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "north",
+      "name": "Дасия",
+      "label": "Дасия",
+      "type": "Городок",
+      "text": [
+        "Дасия лежит на севере, вдали от побережья, и от Солэйна её отделяет лес. Над домами поднимается высокое здание с островерхой крышей."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: ряд домов с высоким зданием на севере"
+      ],
+      "map": {
+        "x": 1050,
+        "y": 104,
+        "sprite": "market_town",
+        "w": 165,
+        "fs": 40
+      }
+    },
+    {
+      "slug": "lakhavur",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "mountains",
+      "name": "Лакхавур",
+      "label": "Лакхавур",
+      "type": "Деревня",
+      "text": [
+        "Лакхавур стоит на двух холмах среди южных гор, недалеко от берега, посередине между Ингрирой на западе и Крагор-Халом на востоке."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: дома на холме среди гор на южном берегу"
+      ],
+      "map": {
+        "x": 1198,
+        "y": 1074,
+        "sprite": "dwarf_village",
+        "w": 155,
+        "fs": 38
+      }
+    },
+    {
+      "slug": "tond",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "mountains",
+      "name": "Тонд",
+      "label": "Тонд",
+      "type": "Башня",
+      "text": [
+        "Тонд стоит на вершине в северной части западных гор, недалеко от берега Драконьего Моря. Южнее, в тех же горах, лежит Ингрира."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: башня с домом на горе в западных горах"
+      ],
+      "map": {
+        "x": 347,
+        "y": 432,
+        "sprite": "watchtower",
+        "w": 118,
+        "fs": 38
+      }
+    },
+    {
+      "slug": "tonhil",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "north",
+      "name": "Тонхил",
+      "label": "Тонхил",
+      "type": "Хутор",
+      "text": [
+        "Тонхил стоит на западной опушке леса, к северо-востоку от городка Брайтвотер, на другом берегу реки. Здесь один двор, а рядом распахано поле."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: двор с распаханными полями в лесу"
+      ],
+      "map": {
+        "x": 797,
+        "y": 238,
+        "sprite": "hamlet",
+        "w": 128,
+        "fs": 36
+      }
+    },
+    {
+      "slug": "lishera",
+      "aliases": [],
+      "kind": "city",
+      "status": "master",
+      "group": "north",
+      "name": "Лишера",
+      "label": "Лишера",
+      "type": "Деревня",
+      "text": [
+        "Лишера стоит в холмах к северу от городка Брайтвотер, между двумя реками. У самых домов пасётся скот."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: несколько домов и скот у реки на севере"
+      ],
+      "map": {
+        "x": 732,
+        "y": 92,
+        "sprite": "village",
+        "w": 132,
+        "fs": 36
+      }
+    },
+    {
+      "slug": "evaliya",
+      "aliases": [],
+      "kind": "island",
+      "status": "master",
+      "group": "sea",
+      "name": "Эвалия",
+      "label": "о. Эвалия",
+      "type": "Остров",
+      "text": [
+        "Эвалия лежит в северной части Драконьего Моря, к югу от побережья между Солэйном и Клаттер-Коувом. Остров зарос лесом, а посередине высится гора."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: остров с лесом, подпись «о. Эвалия»"
+      ],
+      "map": {
+        "x": 1410,
+        "y": 448,
+        "fs": 40
+      }
+    },
+    {
+      "slug": "hargolim",
+      "aliases": [],
+      "kind": "island",
+      "status": "master",
+      "group": "sea",
+      "name": "Харголим",
+      "label": "о. Харголим",
+      "type": "Остров",
+      "text": [
+        "На востоке Драконьего Моря лежит Харголим. Середину острова занимают горы, а лес растёт вокруг них, гуще всего на западе."
+      ],
+      "sources": [
+        "map/reference/original-map.webp: остров с лесом, подпись «о. Харголим»"
+      ],
+      "map": {
+        "x": 1612,
+        "y": 700,
+        "fs": 40
+      }
+    },
+    {
+      "slug": "bardovskoe-vdohnovenie",
+      "aliases": [],
+      "kind": "ship",
+      "status": "show",
+      "group": "sea",
+      "name": "Бардовское вдохновение",
+      "label": "Бардовское вдохновение",
+      "type": "Корабль",
+      "shareName": "корабль «Бардовское вдохновение»",
+      "text": [
+        "На этом пиратском корабле плавают плут Гаспар, бард Патрик и следопыт Эллиана."
+      ],
+      "related": [
+        {
+          "title": "Гильдия Героев Бестары (ГГБ)",
+          "path": "/world/gildiya-geroev-bestary-ggb/"
+        }
+      ],
+      "link": "https://www.youtube.com/@dicewilldecide",
+      "sources": [
+        "guides/01-klassy/research/CAST.md:9–11",
+        "boosty/TEXTS.md:23"
+      ],
+      "map": {
+        "ship": 0
+      }
+    }
+  ]
+}

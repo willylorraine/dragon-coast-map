@@ -2,15 +2,26 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Драконье побережье</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07180f">
+<title>Драконье побережье · карта из мира «Стражей беспорядка»</title>
+<meta name="description" content="Интерактивная карта из мира шоу «Стражи беспорядка». Нажми на город, чтобы узнать, что о нём известно.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Драконье побережье">
+<meta property="og:description" content="Интерактивная карта из мира шоу «Стражи беспорядка». Нажми на город, чтобы узнать, что о нём известно.">
+<meta property="og:url" content="https://willylorraine.github.io/dragon-coast-map/">
+<meta property="og:image" content="https://willylorraine.github.io/dragon-coast-map/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 @font-face { font-family: Epos; src: url(fonts/Epos-Normal.woff2) format("woff2"); font-weight: 400; }
 @font-face { font-family: Epos; src: url(fonts/Epos-Medium.woff2) format("woff2"); font-weight: 600; }
 
-/* токены бренда — motion-дизайн/brand/tokens.css */
+/* токены арта карты — motion-дизайн/brand/tokens.css; токены интерфейса живут в ui.css */
 :root {
-  --bg-emerald: #07180F; --card-emerald: #1C3022;
   --gold: #D8BD80; --gold-deep: #AE8E4F; --gold-shadow: #7A5E2C; --gold-hi: #F6E7BE;
   --paper-ink: #2B2118;
   --ease-out: cubic-bezier(.16,1,.3,1); --ease-cam: cubic-bezier(.48,.1,0,.9);
@@ -24,27 +35,9 @@ body::after { /* зерно поверх фона, чтобы изумруд н�
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---------- шапка: лого «Стражей» золотом + название ---------- */
-.head { position: absolute; top: 14px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none;
-  opacity: 0; transform: translateY(-10px); transition: opacity 1.2s var(--ease-out) 3.4s, transform 1.2s var(--ease-out) 3.4s; }
-.ready .head { opacity: 1; transform: none; }
-.gold-tex { background: url(brand/gold_1024.jpg) center / 420px; position: relative; }
-.gold-tex::after { /* блик проходит по металлу */
-  content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgba(255,246,214,.75) 50%, transparent 60%) no-repeat;
-  background-size: 300% 100%; animation: sweep 6s var(--ease-out) 3.5s infinite; mix-blend-mode: overlay; -webkit-mask: inherit; mask: inherit; }
-@keyframes sweep { 0% { background-position: 120% 0; } 30%, 100% { background-position: -40% 0; } }
-/* лого — растровое золото с прозрачностью (обложки площадок/Лого), без маски и без рамки */
-.logo { width: 150px; height: 74px; background: url(brand/strazhi_gold.png) center / contain no-repeat; filter: drop-shadow(0 3px 6px rgba(0,0,0,.6)); position: relative;
-  -webkit-mask: url(brand/strazhi_gold.png) center / contain no-repeat; mask: url(brand/strazhi_gold.png) center / contain no-repeat; }
-.logo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgba(255,246,214,.8) 50%, transparent 60%) no-repeat;
-  background-size: 300% 100%; animation: sweep 6s var(--ease-out) 4s infinite; mix-blend-mode: overlay; }
-.title { font-size: clamp(18px, 1.9vw, 30px); letter-spacing: .34em; text-transform: uppercase; padding-left: .34em;
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
-.title::after { -webkit-background-clip: text; background-clip: text; }
-
 /* ---------- свиток ---------- */
 .stage-wrap { position: absolute; inset: 112px 0 92px; display: grid; place-items: center; }
-.scroll { position: relative; aspect-ratio: 3372 / 1947; width: min(calc(100vw - 260px), calc((100vh - 200px) * 1.7319), calc((100vh - 34px) / 1.68 * 1.7319)); }
+.scroll { position: relative; aspect-ratio: 3372 / 1947; width: min(calc(100vw - 260px), calc((100vh - 200px) * 1.7319), calc((100vh - 34px) / 1.68 * 1.7319)); opacity: 0; }
 .paper-wrap { position: absolute; inset: 0; filter: drop-shadow(0 26px 30px rgba(0,0,0,.55)) drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
 .paper { position: absolute; inset: 0; overflow: hidden;
   clip-path: inset(0 calc(50% - 50% * var(--open)) 0 calc(50% - 50% * var(--open))); }
@@ -55,7 +48,8 @@ body::after { /* зерно поверх фона, чтобы изумруд н�
 
 .viewport { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; cursor: grab; }
 .viewport.drag { cursor: grabbing; }
-#gl, #ov { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#gl, #ov, .paper-fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.paper-fallback { pointer-events: none; -webkit-user-drag: none; user-select: none; }
 
 /* валики — спрайт Higgsfield: рулон занимает 18,1…79,9 % высоты, ось — 52,6 % ширины */
 .roller { position: absolute; z-index: 10; pointer-events: none; height: calc(100% * 1.04 / .618); top: calc(50% - 100% * 1.04 / .618 * .4896);
@@ -75,44 +69,41 @@ body::after { /* зерно поверх фона, чтобы изумруд н�
 .settle { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; }
 .ready .settle { animation: settle 1.1s var(--ease-out) var(--d, 2.4s) both; }
 @keyframes settle { 0% { opacity: 0; transform: translateY(12px) scale(.97); } 100% { opacity: 1; transform: none; } }
-.place { cursor: pointer; }
-.place image { transition: filter .25s; }
-.place:hover image { filter: url(#hover); }
 .place .hit { fill: transparent; }
 
-/* ---------- подсказка и панель ---------- */
-.tip { position: fixed; z-index: 30; pointer-events: none; padding: 9px 16px 8px; min-width: 150px;
-  background: linear-gradient(180deg, #1C3022, #0c1f15); border: 1px solid var(--gold-deep);
-  box-shadow: 0 0 0 3px rgba(2,9,6,.6), 0 14px 30px rgba(0,0,0,.6);
-  color: var(--gold-hi); font-size: 22px; letter-spacing: .08em; text-transform: uppercase;
-  opacity: 0; transform: translate(-50%, -112%); transition: opacity .15s; }
-.tip small { display: block; font-size: 12px; letter-spacing: .24em; color: var(--gold-deep); margin-top: 3px; }
-.tip.on { opacity: 1; }
-.bar { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); width: min(720px, calc(100vw - 32px)); display: flex; justify-content: center; gap: 8px 10px; flex-wrap: wrap;
-  opacity: 0; transition: opacity 1s ease 4.2s; }
-.ready .bar { opacity: 1; }
 /* свет пробегает по всему листу после разворота */
 .sheen { position: absolute; inset: 0; z-index: 6; pointer-events: none; mix-blend-mode: soft-light; opacity: 0;
   background: linear-gradient(100deg, transparent 38%, rgba(255,242,205,.95) 50%, transparent 62%) no-repeat; background-size: 260% 100%; }
 /* видеоверсия для серий: без шапки и кнопок, лист лежит по диагонали */
-body.video .head, body.video .bar, body.video .tip { display: none; }
 body.video .stage-wrap { inset: 0 0 70px 0; }
 body.video .scroll { width: 55vw; }
 body.video .viewport { cursor: default; will-change: auto; }   /* без will-change браузер перерастрирует слой в каждом кадре, а не растягивает старый */
 body.alpha { background: transparent; }
 body.alpha::after { display: none; }
-.bar button { font: inherit; font-size: 14px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); cursor: pointer;
-  background: linear-gradient(180deg, #1C3022, #102519); border: 1px solid var(--gold-shadow); padding: 9px 18px 8px;
-  box-shadow: inset 0 1px 0 rgba(246,231,190,.12), 0 6px 16px rgba(0,0,0,.45); transition: border-color .2s, color .2s; }
-.bar button:hover { border-color: var(--gold); color: var(--gold-hi); }
-.bar .hint { flex-basis: 100%; text-align: center; font-size: 12px; letter-spacing: .2em; color: var(--gold-shadow); text-transform: uppercase; }
+.noscript { position: fixed; inset: auto 16px 16px 16px; margin: 0; text-align: center; font: 16px/1.4 Georgia, serif; color: #f2e8d0; }
 </style>
+<script>
+/* Загрузчик интерактивного режима: ui.css, ui.js и предзагрузка (ТЗ 3.11). В ?video не грузится ничего из этого:
+   видео берёт оригиналы PNG и JPG и не знает про интерфейс. */
+(function () {
+  if (new URLSearchParams(location.search).has('video')) return;
+  document.documentElement.classList.add('ui');
+  var pre = function (as, href, extra) { return '<link rel="preload" as="' + as + '" href="' + href + '"' + (extra || '') + '>'; };
+  document.write(
+    '<link rel="stylesheet" href="ui.css">' +
+    pre('font', 'fonts/Epos-Medium.woff2', ' type="font/woff2" crossorigin') +
+    pre('font', 'fonts/spectral-400-cyrillic.woff2', ' type="font/woff2" crossorigin') +
+    pre('image', 'sprites/scroll_roller.webp', ' fetchpriority="high"') +
+    pre('image', 'tex_mask.webp') + pre('image', 'tex_ink.webp') + pre('image', 'tex_relief.webp') + pre('image', 'tex_parchment.webp') +
+    pre('fetch', 'data/places.json', ' crossorigin') + pre('fetch', 'data/strings.json', ' crossorigin') +
+    '<script src="ui.js"><\/script>');
+})();
+</script>
 </head>
 <body>
-<div class="head">
-  <div class="logo"></div>
-  <div class="title gold-tex">Драконье побережье</div>
-</div>
+<noscript><p class="noscript">Без JavaScript карта не развернётся. Включи его и обнови страницу.</p></noscript>
+<p class="loading" id="loading" role="status" hidden>Разворачиваем карту…</p>
+<template id="static-strings"><p data-key="toast.dataError">Описания мест не загрузились. Обнови страницу.</p></template>
 
 <div class="stage-wrap">
   <div class="scroll" id="scroll">
@@ -126,43 +117,45 @@ body.alpha::after { display: none; }
         <div class="sheen" id="sheen"></div>
       </div>
     </div>
-    <img class="roller l" src="sprites/scroll_roller.png" alt="">
-    <img class="roller r" src="sprites/scroll_roller.png" alt="">
+    <img class="roller l" alt="" draggable="false">
+    <img class="roller r" alt="" draggable="false">
   </div>
 </div>
 
-<div class="bar">
-  <button id="replay">Свернуть и развернуть</button>
-  <button id="toggle">Пауза моря</button>
-  <button id="reset">Весь масштаб</button>
-  <span class="hint">колесо — приблизить · тянуть — двигать · клик по городу</span>
-</div>
-<div class="tip" id="tip"></div>
-
 <script>
+/* ===================== режим ===================== */
+const Q = new URLSearchParams(location.search);
+const VIDEO = Q.has('video'), ALPHA = Q.has('alpha');
+if (VIDEO) document.body.classList.add('video');
+if (ALPHA) document.body.classList.add('alpha');
+// интерактивный режим грузит WebP, ?video — оригиналы PNG и JPG (ТЗ 3.11)
+let EXT = VIDEO ? 'png' : 'webp';
+const SPR = f => `sprites/${f}.${EXT}`;
+document.querySelectorAll('.roller').forEach(r => { r.src = SPR('scroll_roller'); });   // как раньше: валики грузятся с самого начала
+const TEXFILES = () => VIDEO
+  ? { uMask: 'tex_mask.png', uInk: 'tex_ink.png', uRelief: 'tex_relief.png', uPaper: 'tex_parchment.jpg' }
+  : { uMask: 'tex_mask.webp', uInk: 'tex_ink.webp', uRelief: 'tex_relief.webp', uPaper: 'tex_parchment.webp' };
+const TEXORIG = { 'tex_mask.webp': 'tex_mask.png', 'tex_ink.webp': 'tex_ink.png', 'tex_relief.webp': 'tex_relief.png', 'tex_parchment.webp': 'tex_parchment.jpg' };
+// таймлайн разворота, секунды от старта
+const TL = { drop: .9, open: .9, openDur: 2.7, icons: 3.0, sea: 3.6, compass: 3.2, sheen: 3.5 };
+const INTRO_END = 4.6, FX_END = 13, T_STILL = 2;   // T_STILL: на нём оба чудища всплыли, море «стоит» красиво
+const REDUCED = !VIDEO && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COARSE = !VIDEO && matchMedia('(pointer: coarse)').matches;
+const store = {
+  get(area, k) { try { return window[area].getItem(k); } catch (e) { return null; } },
+  set(area, k, v) { try { window[area].setItem(k, v); } catch (e) {} }
+};
+
 /* ===================== данные карты ===================== */
 // координаты из превью 2000px оригинала -> пиксели текстуры 3072×1727
 const K = 2.119, FRAME = 72, S = 0.7503663898387885;
 const P = (x, y) => [(x * K - FRAME) * S, (y * K - FRAME) * S];
 
-// иконки — Seedream по шаблону карточек (гайдбук 05), _build/gen_map_icons.sh
-const PLACES = [
-  { n: 'Ингрира',    x: 572,  y: 1003, f: 'dwarf_city',    w: 245, fs: 54, sub: 'дварфийский город' },
-  { n: 'Крагор-Хал', x: 1818, y: 1046, f: 'dwarf_hold',    w: 205, fs: 46, sub: 'дварфийская крепость' },
-  { n: 'Клатр-Ков',  x: 1652, y: 236,  f: 'harbor',        w: 215, fs: 46, sub: 'прибрежный город' },
-  { n: 'Солейн',     x: 1298, y: 266,  f: 'cathedral',     w: 200, fs: 44, sub: 'город' },
-  { n: 'Брайтвотер', x: 694,  y: 310,  f: 'walled_town',   w: 185, fs: 42, sub: 'город' },
-  { n: 'Дасия',      x: 1050, y: 104,  f: 'market_town',   w: 165, fs: 40, sub: 'город' },
-  { n: 'Лакхавур',   x: 1198, y: 1074, f: 'dwarf_village', w: 155, fs: 38, sub: 'дварфийская деревня' },
-  { n: 'Тонд',       x: 347,  y: 432,  f: 'watchtower',    w: 118, fs: 38, sub: 'застава' },
-  { n: 'Тонхил',     x: 797,  y: 238,  f: 'hamlet',        w: 128, fs: 36, sub: 'деревня' },
-  { n: 'Лишера',     x: 732,  y: 92,   f: 'village',       w: 132, fs: 36, sub: 'деревня' },
-];
+// Места читаются из data/places.json (ТЗ 4.1). В коде остаётся только декор, который местами не является:
+// причал, корабли, чудища, компас. Иконки — Seedream по шаблону карточек (гайдбук 05), _build/gen_map_icons.sh
 const PORT = { x: 1200, y: 349, f: 'pier', w: 112 };
-const ISLANDS = [ { n: 'о. Эвалия', x: 1410, y: 448 }, { n: 'о. Харголим', x: 1612, y: 700 } ];
 const SHIPS = [
-  { f: 'ship_inspiration', sw: 235, cx: 1150, cy: 648, rx: 88, ry: 44, w: 0.05, ph: 2.4,
-    n: 'Бардовское вдохновение', sub: 'корабль героев' },
+  { f: 'ship_inspiration', sw: 235, cx: 1150, cy: 648, rx: 88, ry: 44, w: 0.05, ph: 2.4 },   // подпись и слаг приходят из данных (map.ship = 0)
   { f: 'caravel', sw: 140, cx: 850,  cy: 692, rx: 118, ry: 26, w: 0.045, ph: 0.6 },
   { f: 'galleon', sw: 170, cx: 1830, cy: 800, rx: 78,  ry: 88, w: 0.05,  ph: 4.1 },
 ];
@@ -172,15 +165,36 @@ const MONSTERS = [
   { f: 'serpent', x: 1500, y: 905, w: 240, base: .99, period: 14, phase: 0,   drift: 60 },
   { f: 'kraken',  x: 862,  y: 885, w: 200, base: .76, period: 17, phase: 7.5, drift: 24 },
 ];
-const SPRITES = [...new Set([...PLACES.map(p => p.f), PORT.f, ...SHIPS.map(s => s.f), ...MONSTERS.map(m => m.f), 'compass'])];
+// Порядок раскладки подписей влияет на результат (равные кегли обрабатываются по порядку), поэтому он зафиксирован
+// так же, как в старом массиве PLACES: раскладка подписей не меняется (ТЗ раздел 2).
+const CITY_ORDER = ['ingrira', 'kragor-hal', 'klatter-kouv', 'soleyn', 'braytvoter', 'dasiya', 'lakhavur', 'tond', 'tonhil', 'lishera'];
+const ISLAND_ORDER = ['evaliya', 'hargolim'];
+// Запас на случай, если data/places.json не загрузился: только подписи и координаты, карточек нет.
+const LEGACY = { places: [
+  ['ingrira', 'Ингрира', 572, 1003, 'dwarf_city', 245, 54], ['kragor-hal', 'Крагор-Хал', 1818, 1046, 'dwarf_hold', 205, 46],
+  ['klatter-kouv', 'Клаттер-Коув', 1652, 236, 'harbor', 215, 46], ['soleyn', 'Солэйн', 1298, 266, 'cathedral', 200, 44],
+  ['braytvoter', 'Брайтвотер', 694, 344, 'braytvoter', 185, 42], ['dasiya', 'Дасия', 1050, 104, 'market_town', 165, 40],
+  ['lakhavur', 'Лакхавур', 1198, 1074, 'dwarf_village', 155, 38], ['tond', 'Тонд', 347, 432, 'watchtower', 118, 38],
+  ['tonhil', 'Тонхил', 797, 238, 'hamlet', 128, 36], ['lishera', 'Лишера', 732, 92, 'village', 132, 36],
+].map(([slug, label, x, y, sprite, w, fs]) => ({ slug, kind: 'city', label, map: { x, y, sprite, w, fs } })).concat([
+  { slug: 'evaliya', kind: 'island', label: 'о. Эвалия', map: { x: 1410, y: 448, fs: 40 } },
+  { slug: 'hargolim', kind: 'island', label: 'о. Харголим', map: { x: 1612, y: 700, fs: 40 } },
+  { slug: 'drakone-more', kind: 'sea', label: 'ДРАКОНЬЕ МОРЕ', map: { seaLabel: true } },
+  { slug: 'bardovskoe-vdohnovenie', kind: 'ship', label: 'Бардовское вдохновение', map: { ship: 0 } },
+]) };
 
-/* ===================== режим ===================== */
-const Q = new URLSearchParams(location.search);
-const VIDEO = Q.has('video'), ALPHA = Q.has('alpha');
-if (VIDEO) document.body.classList.add('video');
-if (ALPHA) document.body.classList.add('alpha');
-// таймлайн разворота, секунды от старта
-const TL = { drop: .9, open: .9, openDur: 2.7, icons: 3.0, sea: 3.6, compass: 3.2, sheen: 3.5 };
+let PLACES = [], CITIES = [], ISLANDS = [], SEA = null, SPRITES = [], SPRITE_SIZE = {};
+function buildModel(list, spriteSize) {
+  PLACES = list; SPRITE_SIZE = spriteSize || {};
+  const rank = (order, slug, i) => { const k = order.indexOf(slug); return k < 0 ? order.length + i : k; };
+  const of = (kind, order) => list.map((p, i) => ({ p, i })).filter(o => o.p.kind === kind)
+    .sort((a, b) => rank(order, a.p.slug, a.i) - rank(order, b.p.slug, b.i)).map(o => o.p);
+  CITIES = of('city', CITY_ORDER).map(p => ({ slug: p.slug, n: p.label, x: p.map.x, y: p.map.y, f: p.map.sprite, w: p.map.w, fs: p.map.fs }));
+  ISLANDS = of('island', ISLAND_ORDER).map(p => ({ slug: p.slug, n: p.label, x: p.map.x, y: p.map.y, fs: p.map.fs || 40 }));
+  const sea = list.find(p => p.kind === 'sea'); SEA = sea ? { slug: sea.slug, n: sea.label } : { slug: null, n: 'ДРАКОНЬЕ МОРЕ' };
+  list.filter(p => p.kind === 'ship').forEach(p => { const s = SHIPS[p.map.ship]; if (s) { s.n = p.label; s.slug = p.slug; } });
+  SPRITES = [...new Set([...CITIES.map(p => p.f), PORT.f, ...SHIPS.map(s => s.f), ...MONSTERS.map(m => m.f), 'compass'])];
+}
 
 /* ===================== WebGL: пергамент, тушь, рельеф, море ===================== */
 const VS = `attribute vec2 a; varying vec2 v; void main(){ v = vec2(a.x*.5+.5, .5-a.y*.5); gl_Position = vec4(a,0.,1.); }`;
@@ -290,23 +304,32 @@ void main(){
 }`;
 
 const cv = document.getElementById('gl');
-const gl = cv.getContext('webgl', { antialias: false, premultipliedAlpha: false, alpha: true, preserveDrawingBuffer: VIDEO });
+const vp = document.getElementById('vp'), scroll = document.getElementById('scroll'), ov = document.getElementById('ov');
+let gl = null, glOK = false, glLost = false, glDirty = true, glT = -1, prog = null, uTloc = null, fallbackOn = false;
+const TEX_IMG = {};   // имя -> { unit, img }: из них текстуры собираются заново после потери контекста
+function getGL() {
+  if (gl) return gl;
+  try { gl = cv.getContext('webgl', { antialias: false, premultipliedAlpha: false, alpha: true, preserveDrawingBuffer: VIDEO }); } catch (e) { gl = null; }
+  return gl;
+}
 function sh(type, src){ const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
   if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
-const prog = gl.createProgram();
-gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
-gl.linkProgram(prog); gl.useProgram(prog);
-gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-const aLoc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(aLoc); gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
 const U = n => gl.getUniformLocation(prog, n);
-gl.uniform2f(U('uTex'), 3072, 1727);
-gl.uniform2f(U('uSheet'), 3372, 1947);
-gl.uniform2f(U('uOff'), 150, 110);
+function buildGL() {
+  prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const aLoc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(aLoc); gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform2f(U('uTex'), 3072, 1727);
+  gl.uniform2f(U('uSheet'), 3372, 1947);
+  gl.uniform2f(U('uOff'), 150, 110);
+  uTloc = U('uT');
+}
 
 const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
-async function tex(url, unit, name){
-  const img = await loadImg(url);
+function uploadTex(name, unit, img){
   const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -315,23 +338,53 @@ async function tex(url, unit, name){
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.uniform1i(U(name), unit);
 }
+async function tex(url, unit, name){
+  // интерактивный режим: если WebP не пришёл, берём оригинал (PNG или JPG)
+  const img = await loadImg(url).catch(e => { if (VIDEO || !TEXORIG[url]) throw e; return loadImg(TEXORIG[url]); });
+  TEX_IMG[name] = { unit, img };
+  if (!glLost) uploadTex(name, unit, img);
+}
 function resize(){
-  const r = cv.getBoundingClientRect();
-  // в видео шейдер рисуем в полном разрешении листа, иначе после наклона и наезда карта мылится
-  const k = VIDEO ? 3372 * 1.25 / Math.max(r.width, 1) : Math.min(window.devicePixelRatio * 1.5, 3372 / Math.max(r.width, 1));
-  cv.width = Math.round(r.width * k); cv.height = Math.round(r.height * k);
+  if (!glOK) return;
+  let k, w, h;
+  if (VIDEO) {
+    const r = cv.getBoundingClientRect(); w = r.width; h = r.height;
+    // в видео шейдер рисуем в полном разрешении листа, иначе после наклона и наезда карта мылится
+    k = 3372 * 1.25 / Math.max(r.width, 1);
+  } else {
+    // бюджет отрисовки (ТЗ 3.11): k = min(DPR × (тонкий указатель ? 1.5 : 1), sqrt(бюджет / (w·h)), 3372 / w)
+    const cs = getComputedStyle(cv); w = parseFloat(cs.width) || 1; h = parseFloat(cs.height) || 1;
+    const budget = COARSE ? 1.6e6 : 4.0e6;
+    k = Math.min((window.devicePixelRatio || 1) * (COARSE ? 1 : 1.5), Math.sqrt(budget / (w * h)), 3372 / Math.max(w, 1));
+  }
+  cv.width = Math.round(w * k); cv.height = Math.round(h * k);
   gl.viewport(0, 0, cv.width, cv.height);
+  glDirty = true;
+  if (texReady && !VIDEO) drawGL(true);   // размер холста сбрасывает его содержимое: перерисовываем в той же задаче
+}
+function drawGL(force){
+  if (!glOK || glLost || !texReady) return;
+  if (!force && !glDirty && T === glT) return;
+  gl.uniform1f(uTloc, T);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  glT = T; glDirty = false;
 }
 
 /* ===================== SVG-оверлей ===================== */
 const NS = 'http://www.w3.org/2000/svg';
-const ov = document.getElementById('ov');
 const el = (tag, attrs = {}, parent = ov) => { const e = document.createElementNS(NS, tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
 const html = (parent, s) => { parent.insertAdjacentHTML('beforeend', s); return parent.lastElementChild; };
 const SIZE = {};   // натуральные размеры спрайтов
+const ANCH = {};   // якоря мест в единицах SVG (интерфейс берёт отсюда центр иконки, подписи или текущую позицию корабля)
+const PLACE_EL = new Map();   // слаг -> { g, hit, icon, kind }
+let seaG = null, seaSweep = null, seaSwept = false;
 
 function buildOverlay(){
+  // блик по надписи моря: в видео бесконечный, как раньше; в интерфейсе один проход, а при reduced motion его нет (ТЗ 3.10)
+  const sweep = VIDEO
+    ? `<animateTransform attributeName="gradientTransform" type="translate" values="-2600 0; 2600 0; 2600 0" keyTimes="0; .35; 1" dur="7s" begin="4s" repeatCount="indefinite"/>`
+    : REDUCED ? '' : `<animateTransform id="seaSweep" attributeName="gradientTransform" type="translate" values="-2600 0; 2600 0; 2600 0" keyTimes="0; .35; 1" dur="7s" begin="indefinite" repeatCount="1"/>`;
   html(ov, `<defs>
     <filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="4" dy="7" stdDeviation="6" flood-color="#1b0f05" flood-opacity=".5"/></filter>
     <filter id="hover" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#F6E7BE" flood-opacity=".9"/><feDropShadow dx="4" dy="7" stdDeviation="6" flood-color="#1b0f05" flood-opacity=".5"/></filter>
@@ -341,13 +394,14 @@ function buildOverlay(){
     <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="3072" y2="0">
       <stop offset="0" stop-color="#E2C88C"/><stop offset=".42" stop-color="#EBD39A"/><stop offset=".5" stop-color="#FFF4D6"/>
       <stop offset=".58" stop-color="#EBD39A"/><stop offset="1" stop-color="#E2C88C"/>
-      <animateTransform attributeName="gradientTransform" type="translate" values="-2600 0; 2600 0; 2600 0" keyTimes="0; .35; 1" dur="7s" begin="4s" repeatCount="indefinite"/>
+      ${sweep}
     </linearGradient>
     <linearGradient id="glintG" x1="0" y1="0" x2="1" y2=".25">
       <stop offset="0" stop-color="#FFF1C8" stop-opacity="0"/><stop offset=".5" stop-color="#FFF1C8" stop-opacity=".85"/><stop offset="1" stop-color="#FFF1C8" stop-opacity="0"/>
     </linearGradient>
     <path id="seaArc" d="M${P(520,452)} Q${P(950,352)} ${P(1390,452)}"/>
   </defs>`);
+  seaSweep = ov.querySelector('#seaSweep');
 
   // рамка: тонкая золотая линия и уголки
   html(ov, `<g pointer-events="none" opacity=".85">
@@ -360,16 +414,17 @@ function buildOverlay(){
   </g>`);
 
   // название моря — золото с бликом
-  const seaG = el('g', { class: 'rise', style: `--d:${TL.sea}s` });
-  html(seaG, `<text class="big-sea" font-size="104" fill="url(#gold)" filter="url(#halo)"><textPath href="#seaArc" startOffset="50%" text-anchor="middle">ДРАКОНЬЕ МОРЕ</textPath></text>`);
+  seaG = el('g', { class: VIDEO ? 'rise' : 'rise place place--sea', style: `--d:${TL.sea}s` });
+  if (!VIDEO && SEA.slug) seaG.setAttribute('data-slug', SEA.slug);
+  html(seaG, `<text class="big-sea" font-size="104" fill="url(#gold)" filter="url(#halo)"><textPath href="#seaArc" startOffset="50%" text-anchor="middle">${SEA.n}</textPath></text>`);
 
   compass();
   monsters = MONSTERS.filter(m => SIZE[m.f]).map(monster);
   ships = SHIPS.map(shipSprite);
 
-  // причал у Солейна
+  // причал у Солэйна
   { const [x, y] = P(PORT.x, PORT.y), w = PORT.w, h = w * SIZE[PORT.f].h / SIZE[PORT.f].w;
-    html(ov, `<g class="settle" style="--d:3.4s"><image href="sprites/${PORT.f}.png" x="${x - w/2}" y="${y - h*.7}" width="${w}" height="${h}" filter="url(#sh)"/></g>`); }
+    html(ov, `<g class="settle" style="--d:3.4s"><image href="${SPR(PORT.f)}" x="${x - w/2}" y="${y - h*.7}" width="${w}" height="${h}" filter="url(#sh)"/></g>`); }
 
   placeLabels();
 }
@@ -379,54 +434,80 @@ function compass(){
   const [cx, cy] = P(...COMPASS), w = 290, h = w * SIZE.compass.h / SIZE.compass.w;
   const g = el('g', { transform: `translate(${cx} ${cy})` });
   const inner = el('g', { class: 'rise', style: `--d:${TL.compass}s` }, g);
-  inner.innerHTML = `<g id="needle"><image href="sprites/compass.png" x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" filter="url(#sh)"/></g>`;
+  inner.innerHTML = `<g id="needle"><image href="${SPR('compass')}" x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" filter="url(#sh)"/></g>`;
 }
 
-let monsters = [], ships, glints = [];
+let monsters = [], ships = [], glints = [];
 function monster(m){
   const [x, y] = P(m.x, m.y), w = m.w, h = w * SIZE[m.f].h / SIZE[m.f].w, up = h * m.base;
   const g = el('g', { transform: `translate(${x} ${y})` });
   const id = 'water_' + m.f;
   html(g, `<defs><clipPath id="${id}"><rect x="${-w}" y="${-up - 40}" width="${w*2}" height="${up + 40}"/></clipPath></defs>`);
   const inner = el('g', {}, el('g', { 'clip-path': `url(#${id})` }, g));
-  inner.innerHTML = `<image href="sprites/${m.f}.png" x="${-w/2}" y="${-up}" width="${w}" height="${h}"/>`;
-  const rip = el('g', {}, g);
+  inner.innerHTML = `<image href="${SPR(m.f)}" x="${-w/2}" y="${-up}" width="${w}" height="${h}"/>`;
+  const rip = el('g', { class: 'monster-rip' }, g);   // круги ряби: в интерфейсе их прячет ui.css (просьба заказчика 2026-10-20), в ?video и ?alpha остаются
   rip.innerHTML = [-.3, 0, .3].map(o => `<ellipse cx="${o*w}" cy="2" rx="${w*.17}" ry="7" fill="none" stroke="#D8BD80" stroke-width="2"/>`).join('');
   return { ...m, inner, rip, up };
 }
 
 function shipSprite(s){
   const h = s.sw * SIZE[s.f].h / SIZE[s.f].w;
-  const g = el('g', { class: 'rise', style: '--d:3.8s' });
+  const named = !VIDEO && s.n && s.slug;
+  const g = el('g', { class: named ? 'rise place place--ship' : 'rise', style: '--d:3.8s' });
+  if (named) g.setAttribute('data-slug', s.slug);
   const pos = el('g', {}, g);
+  let spriteHit = null;
+  if (named) { pos.insertAdjacentHTML('afterbegin', `<rect class="hit" x="${-s.sw/2}" y="${-h*.97}" width="${s.sw}" height="${h}"/>`); spriteHit = pos.firstElementChild; }
   const wake = el('path', { d: `M${-s.sw*.38} 0 Q${-s.sw*.9} -6 ${-s.sw*1.45} 6 M${-s.sw*.38} 3 Q${-s.sw*.9} 14 ${-s.sw*1.45} 22`,
     fill: 'none', stroke: '#e9e2c9', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-dasharray': '16 14', opacity: .45 }, pos);
   el('ellipse', { cx: 0, cy: 0, rx: s.sw*.42, ry: 6, fill: '#e9e2c9', opacity: .3 }, pos);
   const body = el('g', {}, pos);
-  body.innerHTML = `<image href="sprites/${s.f}.png" x="${-s.sw/2}" y="${-h*.97}" width="${s.sw}" height="${h}" filter="url(#sh)"/>`;
-  let label = null;
+  body.innerHTML = `<image href="${SPR(s.f)}" x="${-s.sw/2}" y="${-h*.97}" width="${s.sw}" height="${h}" filter="url(#sh)"/>`;
+  let label = null, labelHit = null, fitHit = null;
   if (s.n) {   // корабль героев: золотая подпись едет вместе с ним, не переворачиваясь
     label = html(g, `<text class="lbl sea" font-size="30" text-anchor="middle">${s.n}</text>`);
-    pos.style.cursor = 'pointer';
-    const tip = document.getElementById('tip');
-    pos.addEventListener('mousemove', e => { tip.innerHTML = `${s.n}<small>${s.sub}</small>`; tip.style.left = e.clientX + 'px'; tip.style.top = (e.clientY - 14) + 'px'; tip.classList.add('on'); });
-    pos.addEventListener('mouseleave', () => tip.classList.remove('on'));
   }
-  return { ...s, g: pos, body, wake, label, h };
+  // Подпись корабля нажимается так же, как сам корабль (QA v2, B1): вторая зона нажатия по рамке подписи. Она лежит в группе корабля:
+  // подпись стоит над кораблём по центру, поэтому переворот scale(-1 1) её не сдвигает. Рамку пересчитывает relabel(), когда меняется кегль подписей.
+  if (named && label) {
+    labelHit = el('rect', { class: 'hit' }, pos);
+    fitHit = () => {
+      label.setAttribute('font-size', +parseFloat(getComputedStyle(label).fontSize).toFixed(2));   // атрибут равен рисуемому размеру (рисует CSS ui.css), его читают и инструменты
+      const b = label.getBBox(), ox = +label.getAttribute('x') || 0, oy = +label.getAttribute('y') || 0, pad = 8;   // рамка относительно точки привязки текста
+      labelHit.setAttribute('x', b.x - ox - pad); labelHit.setAttribute('y', -(h + 6) + b.y - oy - pad);
+      labelHit.setAttribute('width', b.width + 2 * pad); labelHit.setAttribute('height', b.height + 2 * pad);
+    };
+    fitHit();
+  }
+  if (named) {
+    const [sx, sy] = P(s.cx + Math.cos(s.ph) * s.rx, s.cy + Math.sin(s.ph) * s.ry); ANCH[s.slug] = { x: sx, y: sy - h * .47 };
+    PLACE_EL.set(s.slug, { g, hit: spriteHit, hit2: labelHit, icon: body.querySelector('image'), label, kind: 'ship', w: s.sw });
+  }
+  return { ...s, g: pos, body, wake, label, h, fitHit };
 }
 
 /* ---- подписи без наложений: перебираем «над / под / справа / слева», берём первое свободное место ---- */
+// Раскладка считается заново, когда меняется кегль подписей (QA v2, B4 и B5: на узкой бумаге ui.js увеличивает подписи через --lbl-k).
+// Элементы создаются один раз, как раньше (первый вызов); повторные вызовы только переставляют подписи и пересчитывают зоны нажатия.
+// В ?video повторных вызовов нет: порядок создания элементов и результат те же, что до правки.
+let LBL = null;   // слаг -> { holder, t, hit }: острова и города, чьи подписи переставляются
 function placeLabels(){
-  const tip = document.getElementById('tip');
+  const first = !LBL; if (first) LBL = { isl: new Map(), city: new Map() };
   const taken = [];
   const hit = (r) => taken.some(o => r.x0 < o.x1 && r.x1 > o.x0 && r.y0 < o.y1 && r.y1 > o.y0)
     || r.x0 < -10 || r.x1 > 3082 || r.y0 < -40 || r.y1 > 1767;
   const box = (x0, y0, x1, y1, pad = 6) => ({ x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad });
+  const setRect = (r, x, y, w, h) => { r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', w); r.setAttribute('height', h); };
 
   // занято заранее: роза ветров, название моря, все иконки
   const [cx, cy] = P(...COMPASS); taken.push(box(cx - 150, cy - 150, cx + 150, cy + 150));
   const sea = ov.querySelector('.big-sea').getBBox(); taken.push(box(sea.x, sea.y, sea.x + sea.width, sea.y + sea.height));
-  const icons = PLACES.map(pl => { const [x, y] = P(pl.x, pl.y), w = pl.w, h = w * SIZE[pl.f].h / SIZE[pl.f].w;
+  if (!VIDEO && first) {
+    seaG.insertAdjacentHTML('afterbegin', `<rect class="hit" x="${sea.x - 8}" y="${sea.y - 8}" width="${sea.width + 16}" height="${sea.height + 16}"/>`);
+    if (SEA.slug) { ANCH[SEA.slug] = { x: sea.x + sea.width / 2, y: sea.y + sea.height / 2 };
+      PLACE_EL.set(SEA.slug, { g: seaG, hit: seaG.querySelector('.hit'), icon: seaG.querySelector('text'), kind: 'sea' }); }
+  }
+  const icons = CITIES.map(pl => { const [x, y] = P(pl.x, pl.y), w = pl.w, h = w * SIZE[pl.f].h / SIZE[pl.f].w;
     const b = { x, y, w, h, x0: x - w/2, x1: x + w/2, y0: y - h*.86, y1: y + h*.14 };
     taken.push(box(b.x0 + w*.08, b.y0 + h*.1, b.x1 - w*.08, b.y1, 0)); return b; });
 
@@ -434,21 +515,39 @@ function placeLabels(){
 
   // острова
   ISLANDS.forEach((s, i) => { const [x, y] = P(s.x, s.y);
-    const t = html(ov, `<text class="lbl sea rise" style="--d:${3.9 + i*.15}s" font-size="40" text-anchor="middle" x="${x}" y="${y}">${s.n}</text>`);
-    const b = t.getBBox(); taken.push(box(b.x, b.y, b.x + b.width, b.y + b.height)); });
+    let rec = LBL.isl.get(s.slug);
+    if (first) {
+      const holder = VIDEO ? ov : el('g', { class: 'place place--island', 'data-slug': s.slug });
+      const t = html(holder, `<text class="lbl sea rise" style="--d:${3.9 + i*.15}s" font-size="${s.fs}" text-anchor="middle" x="${x}" y="${y}">${s.n}</text>`);
+      rec = { holder, t, hit: null }; LBL.isl.set(s.slug, rec);
+    }
+    const t = rec.t, b = t.getBBox(); taken.push(box(b.x, b.y, b.x + b.width, b.y + b.height));
+    if (!VIDEO) {
+      if (first) {
+        rec.holder.insertAdjacentHTML('afterbegin', `<rect class="hit" x="${b.x - 8}" y="${b.y - 8}" width="${b.width + 16}" height="${b.height + 16}"/>`);
+        rec.hit = rec.holder.querySelector('.hit');
+        PLACE_EL.set(s.slug, { g: rec.holder, hit: rec.hit, icon: t, kind: 'island' });
+      } else { setRect(rec.hit, b.x - 8, b.y - 8, b.width + 16, b.height + 16); PLACE_EL.get(s.slug).hb = null; }
+      ANCH[s.slug] = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+    } });
 
   // города по старшинству: сначала крупные
-  const order = PLACES.map((pl, i) => ({ pl, b: icons[i] })).sort((a, b) => b.pl.fs - a.pl.fs);
+  const order = CITIES.map((pl, i) => ({ pl, b: icons[i] })).sort((a, b) => b.pl.fs - a.pl.fs);
   const dist = order.map(o => Math.hypot(o.pl.x - 1000, o.pl.y - 577)); const dmax = Math.max(...dist);
   order.forEach(({ pl, b }, k) => {
-    const delay = TL.icons + dist[k] / dmax * 1.0;
-    const g = el('g', { class: 'place' });
-    const mid = 'mk' + k, band = b.w * .5;
-    html(g, `<g class="settle" style="--d:${delay}s"><image href="sprites/${pl.f}.png" x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" filter="url(#sh)"/>
-      <mask id="${mid}" style="mask-type:alpha"><image href="sprites/${pl.f}.png" x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}"/></mask>
-      <g mask="url(#${mid})"><rect class="glint" x="${b.x0 - band}" y="${b.y0}" width="${band}" height="${b.h}" fill="url(#glintG)" style="mix-blend-mode:screen" opacity="0"/></g></g>`);
-    glints.push({ rect: g.querySelector('.glint'), span: b.w + band, start: 5 + k * .7 });
-    const t = html(g, `<text class="lbl rise" style="--d:${delay + .35}s" font-size="${pl.fs}" text-anchor="start" x="0" y="0">${pl.n}</text>`);
+    let rec = LBL.city.get(pl.slug), t;
+    if (first) {
+      const delay = TL.icons + dist[k] / dmax * 1.0;
+      const g = el('g', { class: 'place', 'data-slug': pl.slug });
+      const mid = 'mk' + k, band = b.w * .5;
+      html(g, `<g class="settle" style="--d:${delay}s"><image href="${SPR(pl.f)}" x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" filter="url(#sh)"/>
+        <mask id="${mid}" style="mask-type:alpha"><image href="${SPR(pl.f)}" x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}"/></mask>
+        <g mask="url(#${mid})"><rect class="glint" x="${b.x0 - band}" y="${b.y0}" width="${band}" height="${b.h}" fill="url(#glintG)" style="mix-blend-mode:screen" opacity="0"/></g></g>`);
+      glints.push({ rect: g.querySelector('.glint'), span: b.w + band, start: 5 + k * .7 });
+      t = html(g, `<text class="lbl rise" style="--d:${delay + .35}s" font-size="${pl.fs}" text-anchor="start" x="0" y="0">${pl.n}</text>`);
+      rec = { holder: g, t, hit: null }; LBL.city.set(pl.slug, rec);
+    } else { t = rec.t; t.setAttribute('x', 0); t.setAttribute('y', 0); }   // размер меряем из начала координат, как при первой раскладке
+    const g = rec.holder;
     const bb = t.getBBox(), tw = bb.width, th = bb.height, asc = -bb.y, gap = 8;
     const cand = [
       { x0: b.x - tw/2, y0: b.y0 - gap - th },                 // над
@@ -459,50 +558,30 @@ function placeLabels(){
     const c = fit(pl.n, cand);
     t.setAttribute('x', c.x0); t.setAttribute('y', c.y0 + asc);
     taken.push(box(c.x0, c.y0, c.x0 + tw, c.y0 + th));
-    g.insertAdjacentHTML('afterbegin', `<rect class="hit" x="${Math.min(b.x0, c.x0)}" y="${Math.min(b.y0, c.y0)}" width="${Math.max(b.x1, c.x0 + tw) - Math.min(b.x0, c.x0)}" height="${Math.max(b.y1, c.y0 + th) - Math.min(b.y0, c.y0)}"/>`);
-    g.addEventListener('mousemove', e => { tip.innerHTML = `${pl.n}<small>${pl.sub}</small>`; tip.style.left = e.clientX + 'px'; tip.style.top = (e.clientY - 14) + 'px'; tip.classList.add('on'); });
-    g.addEventListener('mouseleave', () => tip.classList.remove('on'));
-    g.addEventListener('click', e => { e.stopPropagation(); flyTo(b.x, b.y, 2.6); });
+    const hx = Math.min(b.x0, c.x0), hy = Math.min(b.y0, c.y0), hw = Math.max(b.x1, c.x0 + tw) - hx, hh = Math.max(b.y1, c.y0 + th) - hy;
+    if (first) {
+      g.insertAdjacentHTML('afterbegin', `<rect class="hit" x="${hx}" y="${hy}" width="${hw}" height="${hh}"/>`);
+      ANCH[pl.slug] = { x: b.x, y: (b.y0 + b.y1) / 2 };
+      PLACE_EL.set(pl.slug, { g, hit: g.querySelector('.hit'), icon: g.querySelector('image'), label: t, kind: 'city', w: pl.w });
+      rec.hit = PLACE_EL.get(pl.slug).hit;
+    } else { setRect(rec.hit, hx, hy, hw, hh); PLACE_EL.get(pl.slug).hb = null; }
   });
+  // Размер подписей в интерфейсе рисует CSS (ui.css, множитель --lbl-k); атрибут font-size приводим к нему, чтобы он не врал о рисуемом размере
+  // (инструменты, в том числе независимый QA, читают размер из атрибута). На картинку это не влияет: стиль сильнее атрибута. В ?video не трогаем.
+  if (!VIDEO) for (const rec of [...LBL.isl.values(), ...LBL.city.values()]) rec.t.setAttribute('font-size', +parseFloat(getComputedStyle(rec.t).fontSize).toFixed(2));
 }
-
-/* ===================== зум и перетаскивание ===================== */
-const vp = document.getElementById('vp'), scroll = document.getElementById('scroll');
-let Z = 1, TX = 0, TY = 0;
-function clamp(){ const w = scroll.clientWidth, h = scroll.clientHeight;
-  Z = Math.min(4, Math.max(1, Z)); TX = Math.min(0, Math.max(w - w*Z, TX)); TY = Math.min(0, Math.max(h - h*Z, TY)); }
-function apply(anim){ clamp(); vp.style.transition = anim ? 'transform 1.1s var(--ease-cam)' : 'none'; vp.style.transform = `translate(${TX}px,${TY}px) scale(${Z})`; }
-function flyTo(x, y, z){ const w = scroll.clientWidth, h = scroll.clientHeight, k = w / 3372;
-  Z = z; TX = w/2 - (x + 150)*k*Z; TY = h/2 - (y + 110)*k*Z; apply(true); }
-scroll.addEventListener('wheel', e => { e.preventDefault(); const r = scroll.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top, z0 = Z; Z *= Math.exp(-e.deltaY * .0015); clamp();
-  TX = mx - (mx - TX) * Z / z0; TY = my - (my - TY) * Z / z0; apply(false); }, { passive: false });
-let drag = null;
-vp.addEventListener('pointerdown', e => { drag = { x: e.clientX - TX, y: e.clientY - TY }; vp.classList.add('drag'); vp.setPointerCapture(e.pointerId); });
-vp.addEventListener('pointermove', e => { if (!drag) return; TX = e.clientX - drag.x; TY = e.clientY - drag.y; apply(false); });
-vp.addEventListener('pointerup', () => { drag = null; vp.classList.remove('drag'); });
-document.getElementById('reset').onclick = () => { Z = 1; TX = 0; TY = 0; apply(true); };
 
 /* ===================== свиток и цикл ===================== */
 // tu — секунды от начала разворота; T — время моря (на паузе стоит)
-let openStart = 0, running = true, T = 0;
+let openStart = 0, running = true, T = 0, texReady = false;
 const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const root = document.documentElement.style;
 const sheen = document.getElementById('sheen');
+let reveal = 1;   // множитель прозрачности свитка: при мгновенном входе сцена проявляется за 150–300 мс
 
-function unroll(){
-  document.body.classList.remove('ready'); void document.body.offsetWidth;
-  openStart = performance.now();
-  setTimeout(() => document.body.classList.add('ready'), 60);
-}
-if (!VIDEO) {
-  document.getElementById('replay').onclick = () => { Z = 1; TX = 0; TY = 0; apply(false); unroll(); };
-  document.getElementById('toggle').onclick = e => { running = !running; e.target.textContent = running ? 'Пауза моря' : 'Оживить море'; };
-}
-
-function draw(tu){
+function draw(tu, heavy = true){
   // 1. свиток опускается на стол, 2. валики расходятся, рулон худеет
   const d = easeOut(clamp01(tu / TL.drop));
   const o = easeInOut(clamp01((tu - TL.open) / TL.openDur));
@@ -514,38 +593,41 @@ function draw(tu){
     cam = `perspective(2600px) rotateX(${22 - 4*c}deg) rotateZ(${-6 + 1.5*c}deg) translateY(${-14*c}px) scale(${1 + .06*c}) `;
   }
   scroll.style.transform = cam + `translateY(${(1 - d) * -60}px) scale(${.93 + .07*d})`;
-  scroll.style.opacity = d;
+  scroll.style.opacity = VIDEO ? d : d * reveal;
 
-  // 3. свет пробегает по листу сразу после разворота и потом раз в 16 с
-  const sh = tu < TL.sheen + 2 ? (tu - TL.sheen) / 1.8 : ((tu - TL.sheen - 2) % 16) / 1.8;
-  sheen.style.opacity = sh > 0 && sh < 1 ? Math.sin(sh * Math.PI) * .9 : 0;
-  sheen.style.backgroundPosition = `${130 - 160*clamp01(sh)}% 0`;
+  // 3. свет пробегает по листу сразу после разворота (в видео и потом раз в 16 с, в интерфейсе один раз)
+  const shn = VIDEO ? (tu < TL.sheen + 2 ? (tu - TL.sheen) / 1.8 : ((tu - TL.sheen - 2) % 16) / 1.8) : (tu - TL.sheen) / 1.8;
+  sheen.style.opacity = !REDUCED && shn > 0 && shn < 1 ? Math.sin(shn * Math.PI) * .9 : 0;
+  sheen.style.backgroundPosition = `${130 - 160*clamp01(shn)}% 0`;
+  if (!heavy) return;
 
-  gl.uniform1f(U('uT'), T);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  if (VIDEO) { gl.uniform1f(U('uT'), T); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+  else drawGL();
 
   ships.forEach(s => {
     const a = s.ph + T*s.w, [x, y] = P(s.cx + Math.cos(a)*s.rx, s.cy + Math.sin(a)*s.ry);
     const flip = -Math.sin(a) < 0 ? -1 : 1;
-    s.g.setAttribute('transform', `translate(${x} ${y + Math.sin(T*1.3 + s.ph*2)*3}) scale(${flip} 1)`);
+    const bob = Math.sin(T*1.3 + s.ph*2)*3;
+    s.g.setAttribute('transform', `translate(${x} ${y + bob}) scale(${flip} 1)`);
     s.body.setAttribute('transform', `rotate(${Math.sin(T*1.7 + s.ph)*3})`);
     s.wake.setAttribute('stroke-dashoffset', (T*40) % 60);
     if (s.label) { s.label.setAttribute('x', x); s.label.setAttribute('y', y - s.h - 6); }
+    if (s.slug && !VIDEO) ANCH[s.slug] = { x, y: y + bob - s.h * .47 };
   });
 
-  // компас: раскручивается при появлении, дрожит и успокаивается, раз в 15 с снова ищет север
+  // компас: раскручивается при появлении, дрожит и успокаивается; в видео раз в 15 с снова ищет север
   const cz = tu - TL.compass;
   let rot = cz < 0 ? -540 : cz < 2.8 ? -540 * (1 - easeOut(cz / 2.8)) : 0;
   if (cz >= 2.8) rot += 7 * Math.exp(-(cz - 2.8) * 1.6) * Math.sin((cz - 2.8) * 7);
-  if (cz > 8) { const k = (cz - 8) % 15; if (k < 3.5) rot += 28 * Math.exp(-k * 1.3) * Math.sin(k * 5.5); }
+  if (VIDEO && cz > 8) { const k = (cz - 8) % 15; if (k < 3.5) rot += 28 * Math.exp(-k * 1.3) * Math.sin(k * 5.5); }
   rot += Math.sin(T * .6) * 1.2;
   const nd = document.getElementById('needle');
   if (nd) nd.setAttribute('transform', `rotate(${rot.toFixed(2)})`);
 
-  // золотой блик проходит по каждой постройке по очереди
+  // золотой блик проходит по каждой постройке по очереди (в видео по кругу, в интерфейсе один проход)
   glints.forEach(gq => {
-    const q = tu < gq.start ? -1 : ((tu - gq.start) % 9) / 1.4;
-    if (q < 0 || q > 1) { gq.rect.setAttribute('opacity', 0); return; }
+    const q = tu < gq.start ? -1 : VIDEO ? ((tu - gq.start) % 9) / 1.4 : (tu - gq.start) / 1.4;
+    if (q < 0 || q > 1 || REDUCED) { gq.rect.setAttribute('opacity', 0); return; }
     gq.rect.setAttribute('opacity', Math.sin(q * Math.PI).toFixed(3));
     gq.rect.setAttribute('transform', `translate(${(easeInOut(q) * gq.span).toFixed(1)} 0)`);
   });
@@ -560,14 +642,6 @@ function draw(tu){
   });
 }
 
-let last = performance.now();
-function frame(now){
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  if (running) T += dt;
-  draw((now - openStart) / 1000);
-  requestAnimationFrame(frame);
-}
-
 // видео: кадр строго по времени t — CSS-анимации, SMIL и шейдер ставятся в одну точку
 window.renderAt = t => {
   T = t;
@@ -576,17 +650,227 @@ window.renderAt = t => {
   draw(t);
 };
 
-(async () => {
-  await Promise.all([
-    tex('tex_mask.png', 0, 'uMask'), tex('tex_ink.png', 1, 'uInk'), tex('tex_relief.png', 2, 'uRelief'), tex('tex_parchment.jpg', 3, 'uPaper'),
-    document.fonts.load('40px Epos'), loadImg('sprites/scroll_roller.png'),
-    ...SPRITES.map(f => loadImg(`sprites/${f}.png`).then(i => { SIZE[f] = { w: i.naturalWidth, h: i.naturalHeight }; }, () => {})),
-  ]);
+/* ===================== мост к интерфейсу (ui.js) ===================== */
+const listeners = {};
+const emit = (name, arg) => (listeners[name] || []).forEach(fn => { try { fn(arg); } catch (e) { console.error(e); } });
+const loadingEl = document.getElementById('loading');
+let STATE = 'loading', instant = false, introOn = false, gate = false, skipPending = false, waitFrom = 0, readyAdded = false;
+let phaseHead = false, phaseChrome = false, revealFrom = 0, revealDur = 300, finalDraw = false;
+const DCM = window.DCM = {
+  VIDEO, ALPHA, REDUCED, COARSE, EXT: () => EXT,
+  els: { scroll, vp, ov, gl: cv, sheen },
+  get state() { return STATE; },
+  get T() { return T; },
+  get motion() { return running; },
+  get instant() { return instant; },
+  get fallback() { return fallbackOn; },
+  placeEls: PLACE_EL,
+  data: null,   // Promise: { places, strings, meta, ok }
+  on(name, fn) { (listeners[name] = listeners[name] || []).push(fn); },
+  setMotion(on) { running = !!on; document.body.classList.toggle('motion-off', !on); },
+  initMotion(on) { DCM.setMotion(on); if (!on) T = T_STILL; },   // стоячее море берёт кадр, где оба чудища всплыли
+  anchor(slug) { return ANCH[slug] || null; },   // единицы SVG
+  iconWidth(slug) { const e = PLACE_EL.get(slug); return e && e.w || 0; },
+  // ui.js: на узкой бумаге подписи крупнее (--lbl-k, QA v2 B4 и B5); раскладка без наложений считается заново, зоны нажатия подгоняются под новые рамки
+  relabel() {
+    if (VIDEO || !LBL) return false;
+    placeLabels();
+    ships.forEach(s => { if (s.fitHit) { s.fitHit(); const e = PLACE_EL.get(s.slug); if (e) e.hb2 = null; } });
+    return true;
+  },
+  resize, dirty() { glDirty = true; },
+  introTime() { return introOn ? (instant ? 99 : (performance.now() - openStart) / 1000) : 0; },
+  skipIntro() { return skipIntro(); },
+  replay() { return replay(); },
+  glPixel(fx, fy) {   // отладка: перерисовать и прочитать пиксель холста в одной задаче
+    if (!glOK || glLost) return null; drawGL(true);
+    const px = new Uint8Array(4); gl.readPixels(Math.floor(cv.width * fx), Math.floor(cv.height * (1 - fy)), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return [...px];
+  },
+  glInfo() { return { ok: glOK, lost: glLost, fallback: fallbackOn, w: cv.width, h: cv.height }; },
+};
+function setState(s) { if (STATE === s) return; STATE = s; document.documentElement.dataset.mapState = s; emit('state', s); }
+
+function headPhase() { if (phaseHead) return; phaseHead = true; emit('phase', 'head'); }
+function chromePhase() { if (phaseChrome) return; phaseChrome = true; emit('phase', 'chrome'); }
+function stepIntro(tu, now) {
+  if (!gate) {
+    // текстуры ещё не пришли: на 0,9 с свиток лежит свёрнутым, через 1,2 с ожидания под ним появляется строка «Разворачиваем карту…»
+    if (loadingEl.hidden && waitFrom && now - waitFrom > 1200) loadingEl.hidden = false;
+    return;
+  }
+  if (!loadingEl.hidden) loadingEl.hidden = true;
+  if (!readyAdded && tu >= TL.open) { readyAdded = true; document.body.classList.add('ready'); }
+  if (tu >= .4) headPhase();
+  if (tu >= 3.6) chromePhase();
+  if (STATE === 'intro' && tu >= INTRO_END) endIntro();
+}
+function endIntro() { store.set('sessionStorage', 'dcm:intro', '1'); setState('ready'); headPhase(); chromePhase(); }
+function skipIntro() {
+  if (instant || !introOn || STATE !== 'intro') return false;
+  document.body.classList.add('skip-intro');
+  if (!gate) { skipPending = true; return true; }   // свиток ещё лежит свёрнутым: пропуск сработает, когда придут текстуры
+  openStart = performance.now() - INTRO_END * 1000;
+  draw(INTRO_END, false);   // сразу, не дожидаясь кадра: --open = 1 и свиток на месте
+  headPhase(); chromePhase();
+  return true;
+}
+function replay() {
+  if (VIDEO || !gate) return;
+  document.body.classList.remove('ready', 'skip-intro');
+  readyAdded = false; phaseHead = false; phaseChrome = false; seaSwept = false; skipPending = false; instant = false; reveal = 1;
+  void document.body.offsetWidth;
+  openStart = performance.now(); introOn = true;
+  setState('intro'); emit('replay');
+}
+
+let last = performance.now(), fN = 0;
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (running) T += dt;
+  let tu = 0;
+  if (introOn) {
+    if (instant) tu = 99;
+    else {
+      tu = (now - openStart) / 1000;
+      if (!gate && tu > TL.open) {   // ждём текстуры: часы стоят на начале разворота и продолжатся с этого места
+        openStart = now - TL.open * 1000; tu = TL.open; if (!waitFrom) waitFrom = now;
+      }
+      if (gate && skipPending) { skipPending = false; openStart = now - INTRO_END * 1000; tu = INTRO_END; headPhase(); chromePhase(); }
+    }
+  }
+  if (revealFrom) { reveal = clamp01((now - revealFrom) / revealDur); if (reveal >= 1) { revealFrom = 0; finalDraw = true; } }
+  stepIntro(tu, now);
+  if (!seaSwept && seaSweep && gate && tu >= 4 && tu < 99) { seaSwept = true; try { seaSweep.beginElement(); } catch (e) {} }
+  // когда движение остановлено и ничего не проявляется, кадр не нужен (ТЗ 3.10)
+  if (!(running || tu < FX_END || glDirty || revealFrom || finalDraw)) return;
+  finalDraw = false;   // последний кадр проявления обязан дойти до прозрачности 1
+  const heavy = !COARSE || (++fN & 1) === 0;   // на грубом указателе шейдер и корабли рисуются через кадр
+  draw(tu, heavy);
+}
+document.addEventListener('visibilitychange', () => {
+  // в скрытой вкладке цикл стоит; при возврате часы вступления продолжаются без скачка
+  if (document.hidden) { DCM._hiddenAt = performance.now(); return; }
+  if (DCM._hiddenAt && introOn && !instant && STATE === 'intro') openStart += performance.now() - DCM._hiddenAt;
+  DCM._hiddenAt = 0; last = performance.now();
+});
+
+/* ===================== загрузка ===================== */
+const loadJSON = async url => { const r = await fetch(url); if (!r.ok) throw new Error(url + ': ' + r.status); return r.json(); };
+function legacyData() { return { places: LEGACY.places, strings: null, meta: {}, spriteSize: {}, ok: false }; }
+async function loadData() {
+  try {
+    const [pl, st] = await Promise.all([loadJSON('data/places.json'), VIDEO ? null : loadJSON('data/strings.json')]);
+    return { places: pl.places, strings: st, meta: pl, spriteSize: pl.spriteSize || {}, ok: true };
+  } catch (e) { return legacyData(); }
+}
+async function ensureSizes() {
+  // размеры спрайтов берутся из данных, чтобы раскладка не ждала картинок; в видео и для спрайтов без записи меряем сами
+  await Promise.all(SPRITES.map(async f => {
+    const s = SPRITE_SIZE[f];
+    if (!VIDEO && s) { SIZE[f] = { w: s[0], h: s[1] }; return; }
+    try { const i = await loadImg(SPR(f)); SIZE[f] = { w: i.naturalWidth, h: i.naturalHeight }; } catch (e) {}
+  }));
+}
+function enableFallback() {
+  if (fallbackOn || VIDEO) return;
+  fallbackOn = true; glOK = false;
+  cv.style.display = 'none';
+  const img = new Image(); img.className = 'paper-fallback'; img.alt = ''; img.draggable = false; img.decoding = 'async';
+  img.src = 'tex_fallback.webp'; vp.insertBefore(img, ov);
+  emit('glfallback');
+  return img;
+}
+// Страница показывает стадии: свёрнутый свиток -> разворот (когда пришли текстуры и данные) -> остальное
+async function bootUI() {
+  document.documentElement.dataset.mapState = 'loading';
+  const instantMode = REDUCED || store.get('sessionStorage', 'dcm:intro') === '1';
+  instant = instantMode;
+  if (instant) { document.body.classList.add('skip-intro'); reveal = 0; }
+  // WebGL: нет контекста или не собрался шейдер -> кадр без оверлея вместо пустого экрана
+  let fbImg = null;
+  if (getGL()) {
+    try { buildGL(); glOK = true; } catch (e) { glOK = false; }
+    cv.addEventListener('webglcontextlost', e => {
+      e.preventDefault(); glLost = true;
+      clearTimeout(DCM._lostTimer); DCM._lostTimer = setTimeout(() => { if (glLost) enableFallback(); }, 3000);
+    });
+    cv.addEventListener('webglcontextrestored', () => {
+      clearTimeout(DCM._lostTimer); glLost = false;
+      try { buildGL(); for (const n in TEX_IMG) uploadTex(n, TEX_IMG[n].unit, TEX_IMG[n].img); glOK = true; resize(); glDirty = true; drawGL(true); }
+      catch (e) { enableFallback(); }
+    });
+  }
+  if (!glOK) fbImg = enableFallback();
+
+  // порядок загрузки (ТЗ 3.11): валик -> четыре текстуры -> данные -> остальные спрайты
+  const roller = [...document.querySelectorAll('.roller')];
+  const rollerP = new Promise(res => {
+    const r = roller[0];
+    if (r.complete && r.naturalWidth) return res();
+    r.addEventListener('load', () => res(), { once: true });
+    r.addEventListener('error', () => {   // нет WebP: вся страница берёт PNG
+      if (EXT !== 'webp') return res();
+      EXT = 'png'; roller.forEach(x => { x.src = SPR('scroll_roller'); });
+      r.addEventListener('load', () => res(), { once: true }); r.addEventListener('error', () => res(), { once: true });
+    }, { once: true });
+  });
+  const fontsP = document.fonts.load('40px Epos').catch(() => {});
+  const texP = (glOK ? Promise.all(Object.entries(TEXFILES()).map(([n, f], i) => tex(f, i, n)))
+                     : (fbImg ? new Promise(res => { fbImg.onload = fbImg.onerror = () => res(); }) : Promise.resolve()))
+    .catch(() => { const i = enableFallback(); return i ? new Promise(res => { i.onload = i.onerror = () => res(); }) : null; })
+    .then(() => { texReady = true; });
+  // данные приходят раньше текстур: сразу строим модель и греем кэш спрайтов с низким приоритетом
+  const keep = [];
+  const modelP = DCM.data.then(data => {
+    buildModel(data.places, data.spriteSize);
+    SPRITES.forEach(f => { const i = new Image(); i.fetchPriority = 'low'; i.src = SPR(f); keep.push(i); });
+    return data;
+  });
+
+  const begin = () => {
+    introOn = true; openStart = performance.now(); last = performance.now();
+    if (!instant) setState('intro');
+    requestAnimationFrame(frame);
+  };
+  if (instant) begin(); else rollerP.then(begin);   // свёрнутый свиток виден, как только пришёл валик
+
+  const [data] = await Promise.all([modelP, texP, fontsP]);
+  await ensureSizes();
   buildOverlay();
-  resize(); window.addEventListener('resize', () => { resize(); apply(false); });
-  if (VIDEO) { document.body.classList.add('ready'); window.renderAt(0); window.__ready = true; }
-  else { requestAnimationFrame(frame); unroll(); }
-})();
+  resize();
+  emit('overlay');
+  // всё на месте: разворот продолжается (или сцена проявляется за 150–300 мс при мгновенном входе)
+  gate = true; waitFrom = 0;
+  if (instant) {
+    revealDur = REDUCED ? 150 : 300; revealFrom = performance.now(); reveal = 0;
+    readyAdded = true; document.body.classList.add('ready');
+    draw(99, false);
+    headPhase(); chromePhase(); setState('ready');
+    store.set('sessionStorage', 'dcm:intro', '1');
+    glDirty = true;
+  }
+}
+
+if (VIDEO) {
+  (async () => {
+    const data = await loadData(); buildModel(data.places, data.spriteSize);
+    const T_ = TEXFILES(); getGL(); buildGL(); glOK = true;
+    await Promise.all([
+      tex(T_.uMask, 0, 'uMask'), tex(T_.uInk, 1, 'uInk'), tex(T_.uRelief, 2, 'uRelief'), tex(T_.uPaper, 3, 'uPaper'),
+      document.fonts.load('40px Epos'), loadImg(SPR('scroll_roller')),
+      ...SPRITES.map(f => loadImg(SPR(f)).then(i => { SIZE[f] = { w: i.naturalWidth, h: i.naturalHeight }; }, () => {})),
+    ]);
+    texReady = true;
+    buildOverlay();
+    resize(); window.addEventListener('resize', resize);
+    document.body.classList.add('ready'); window.renderAt(0); window.__ready = true;
+  })();
+} else {
+  DCM.data = loadData();
+  if (window.DCMUI) window.DCMUI.attach(DCM);
+  bootUI();
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,409 @@
+/* Интерфейс карты «Драконье побережье» (только интерактивный режим; в ?video не грузится).
+   Значения из ТЗ раздел 7. Токены интерфейса в одном блоке :root; токены арта карты остаются в index.html.
+   Hallmark · стилевой проход 2026-10-20 · шрифт: Epos только имена, Spectral остальное, 3 кегля (28/17/14) ·
+   подписи карты: 2 стиля, 4 кегля, одна разрядка · контраст: рамки кнопок 4:1 · подробности map/STYLE-PASS.md */
+
+@font-face { font-family: Spectral; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/spectral-400-cyrillic.woff2) format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: Spectral; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/spectral-400-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: Spectral; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/spectral-500-cyrillic.woff2) format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: Spectral; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/spectral-500-latin.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root {
+  --bg: #07180f;          --surface: #0d2416;     --surface-2: #13321f;
+  --border: #1f4a30;      --border-gold: #8b7340;
+  --gold: #d8bd80;        --gold-bright: #ecd9a0;
+  --text: #f2e8d0;        --text-2: #b5ad94;      --muted: #8f8670;
+  --rust: #c26642;        --focus: #ecd9a0;
+  /* стилевой проход: рамка нажимаемых элементов. --border (#1f4a30) даёт к фону 1,81:1, бронза --border-gold 4,03:1 (норма 3:1) */
+  --line-ctl: var(--border-gold);
+  --copper-rgb: 206, 156, 96;  --teal-rgb: 30, 68, 77;  --gold-rgb: 216, 189, 128;  --bg-rgb: 7, 24, 15;  --surface-rgb: 13, 36, 22;
+  --shadow-tip: 0 6px 16px rgba(0, 0, 0, .45);
+  --shadow-panel: 0 12px 32px rgba(0, 0, 0, .5);
+
+  --font-display: Epos, Georgia, serif;     /* только имена мест и название карты (Epos рисует одни заглавные) */
+  --font-body: Spectral, Georgia, serif;    /* всё остальное, обычный регистр */
+
+  /* Шрифтовая система (стилевой проход, просьба заказчика «вычистить виды шрифта»).
+     Три кегля на раскладку, у каждого одно начертание; второстепенное отличается цветом, а не ещё одним размером.
+     Было 10 кеглей (12,75–30 px) и 12 стилей текста в интерфейсе, стало 3 кегля и 4 стиля. */
+  --fs-title: 28px;   /* Epos 600: имя места в карточке, название карты в шапке */
+  --fs-body: 17px;    /* Spectral 400: абзацы, пункты указателя, главная кнопка; Epos 600 только для имени места в подсказке и названия карты в планке телефона */
+  --fs-meta: 14px;    /* Spectral 400: тип, статус, правитель, подводки, заголовки групп, кнопки-тексты, тихие ссылки, сообщения */
+  --lh-title: 1.1; --lh-body: 1.55; --lh-meta: 1.4;
+  --ls-name: .02em;   /* единственная разрядка в интерфейсе, только у Epos */
+
+  /* Подписи на карте (SVG, единицы листа; только интерактивный режим, ?video рисуется по-старому).
+     Было 10 кеглей (30–104), три разрядки (.05/.14/.34em), золотой градиент и свечение у моря.
+     Стало: суша в двух кеглях (город и деревня), вода в двух (море и остальное), одна разрядка, одна обводка у каждого стиля. */
+  --lbl-k: 1;         /* множитель кеглей подписей на узкой бумаге: его ставит ui.js (applyGeo), 1 на бумаге шире 877 px; QA v2 B4 и B5 */
+  --map-land: calc(46px * var(--lbl-k)); --map-land-minor: calc(38px * var(--lbl-k)); --map-water: calc(34px * var(--lbl-k)); --map-sea: 72px; --map-sea-dy: 30px;
+  --map-ls: .03em; --map-halo: 8px;
+  --halo-land: rgba(242, 229, 200, .88); --halo-water: rgba(5, 20, 13, .82);
+
+  --r-s: 4px; --r-m: 8px; --r-sheet: 14px; --r-pill: 999px;
+  --r-bubble: 18px;   /* подсказки и сообщения: в одну строку это пилюля, в две и больше скруглённый прямоугольник, а не «стадион» */
+  --fade: 32px;       /* растворение текста у нижнего края прокрутки */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in: cubic-bezier(.7, 0, .84, 0);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-cam: cubic-bezier(.48, .1, 0, .9);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+
+  /* размеры раскладки: их же знает ui.js */
+  --head-h: 120px; --band-h: 72px; --bar-h: 48px; --peek-h: 64px; --rail: 44px; --rail-gap: 12px;
+  --sa-t: env(safe-area-inset-top, 0px); --sa-r: env(safe-area-inset-right, 0px); --sa-b: env(safe-area-inset-bottom, 0px); --sa-l: env(safe-area-inset-left, 0px);
+}
+
+/* ---------- страница: никакой прокрутки, никаких 100vw (ТЗ 5.6) ---------- */
+html, body { height: 100vh; height: 100dvh; overflow: clip; overscroll-behavior: none; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body); color: var(--text); -webkit-tap-highlight-color: transparent;
+  background:
+    radial-gradient(56% 30% at 92% 4%, rgba(var(--copper-rgb), .10), transparent 70%),
+    radial-gradient(72% 38% at 6% 102%, rgba(var(--teal-rgb), .55), transparent 70%),
+    var(--bg);
+}
+body.alpha { background: transparent; }
+button, a, input { font-family: var(--font-body); }
+button { touch-action: manipulation; }
+
+/* ---------- сцена и бумага: размер и положение приходят из JS ---------- */
+.stage-wrap { position: absolute; inset: 0; display: block; overflow: clip; }
+.scroll { position: absolute; left: var(--paper-left); top: var(--paper-top); width: var(--paper-w); height: var(--paper-h); aspect-ratio: auto; }
+.paper { overflow: clip; }
+.viewport { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.viewport * { -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+.viewport:focus { outline: none; }
+/* У #vp своя трансформация камеры: при приближении его контур уезжает за край бумаги и не виден.
+   Видимое кольцо рисует неподвижный родитель; прозрачный контур остаётся для режима высокой контрастности. */
+.viewport:focus-visible { outline: 2px solid transparent; outline-offset: -4px; }
+.paper:has(> .viewport:focus-visible)::after {
+  content: ""; position: absolute; inset: 18px 3%; z-index: 7; pointer-events: none;
+  border: 2px solid var(--focus); border-radius: var(--r-s);
+}
+html[data-layout=portrait] .paper:has(> .viewport:focus-visible)::after { content: none; }
+html[data-layout=portrait] .stage-wrap:has(.viewport:focus-visible)::after {
+  content: ""; position: absolute; z-index: 11; pointer-events: none; border: 2px solid var(--focus); border-radius: var(--r-s);
+  inset: calc(var(--bar-h) + var(--sa-t) + 6px) max(6px, var(--sa-r)) calc(var(--peek-h) + var(--sa-b) + 6px) max(6px, var(--sa-l));
+}
+
+/* Подписи на карте: два стиля вместо трёх и два кегля у каждого вместо десяти.
+   Стили применяются до сборки оверлея (ui.css грузится в <head>, слаги у мест стоят до замера),
+   поэтому раскладка подписей без наложений (placeLabels, getBBox) считает уже новые размеры. */
+#ov text.lbl, #ov text.big-sea { font-weight: 400; letter-spacing: var(--map-ls); stroke-width: var(--map-halo); paint-order: stroke; stroke-linejoin: round; }
+/* суша: тёмные чернила с одной светлой обводкой; деревни, хутор и башня на ступень меньше городов */
+#ov .place > text.lbl:not(.sea) { font-size: var(--map-land); fill: var(--paper-ink); stroke: var(--halo-land); }
+#ov .place:is([data-slug=lakhavur], [data-slug=lishera], [data-slug=tonhil], [data-slug=tond]) > text.lbl:not(.sea) { font-size: var(--map-land-minor); }
+/* вода: золото с одной тёмной обводкой; море крупнее островов и корабля, без градиента, свечения и разрядки-штампа */
+#ov text.lbl.sea { font-size: var(--map-water); fill: var(--gold); stroke: var(--halo-water); }
+/* без разрядки подпись моря стала короче дуги, по которой идёт, и легла на береговую линию: сдвиг уводит её на открытую воду.
+   getBBox сдвига не видит, но рядом с подписью моря других подписей нет, наложений это не создаёт */
+#ov text.big-sea { font-size: var(--map-sea); fill: var(--gold); stroke: var(--halo-water); filter: none; transform: translateY(var(--map-sea-dy)); }
+/* пунктирный след за кораблями читался как россыпь точек по морю; на карте мастера его нет, смысла он не несёт */
+#ov path[stroke-dasharray] { display: none; }
+/* круги у кромки воды вокруг левиафана и кракена (три золотых эллипса) убраны по просьбе заказчика 2026-10-20 («странные круги»).
+   Только в интерфейсе: в ?video и ?video&alpha ui.css не грузится, там они остаются, как в эталоне; в ?alpha без ?video тоже остаются */
+body:not(.alpha) #ov .monster-rip { display: none; }
+
+/* места на карте */
+.place { cursor: pointer; }
+.place:focus { outline: none; }
+.place .hit { pointer-events: none; }
+.place:focus-visible .hit { stroke: var(--focus); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+.place--hover image { filter: url(#hover); }
+
+/* движение после разворота: появление отсчитывается от начала раскрытия листа (на 0,9 с), а не от загрузки */
+.ready .rise { animation-delay: calc(var(--d, 2.6s) - .9s); }
+.ready .settle { animation-delay: calc(var(--d, 2.4s) - .9s); }
+body.skip-intro .rise, body.skip-intro .settle { animation-duration: 0s !important; animation-delay: 0s !important; }
+body.skip-intro .app-head, body.skip-intro .band, body.skip-intro .rail { transition-duration: 200ms, 0s; }
+
+/* ---------- общие поверхности и фокус ---------- */
+:where(a, button, input, textarea):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.skip-link {
+  position: fixed; left: var(--space-3); top: var(--space-3); z-index: 100; display: inline-flex; align-items: center; min-height: 44px; min-width: 44px;
+  padding: 0 var(--space-4); background: var(--surface); color: var(--gold); border: 1px solid var(--border-gold); border-radius: var(--r-s);
+  font: 400 var(--fs-meta)/1.2 var(--font-body); text-decoration: none; transform: translateY(-300%);
+}
+.skip-link:focus { transform: none; }
+
+/* стрелки «↗» у внешних ссылок убраны: при 13 px это были мелкие точки-соринки третьего кегля; о новой вкладке сообщает aria-label */
+.ext { display: none; }
+.link-quiet:focus-visible { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+.link-quiet { color: var(--text-2); font: 400 var(--fs-meta)/1.3 var(--font-body); text-decoration: none; display: inline-flex; align-items: center; min-height: 40px; white-space: nowrap; }
+
+.btn-text {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: 0 var(--space-2); margin: 0; border: 0; background: none;
+  color: var(--text-2); font: 400 var(--fs-meta)/1.2 var(--font-body); cursor: pointer; border-radius: var(--r-s);
+}
+.btn-icon { display: inline-flex; }
+
+/* ---------- шапка ---------- */
+.app-head {
+  position: fixed; z-index: 20; display: flex; align-items: center; pointer-events: none;
+  opacity: 0; visibility: hidden; transition: opacity 800ms var(--ease-out), visibility 0s linear 800ms;
+}
+body.head-on .app-head { opacity: 1; visibility: visible; transition-delay: 0s; }
+.app-head > * { pointer-events: auto; }
+.app-logo { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.app-logo img { display: block; width: 100%; height: auto; transition: opacity var(--dur-micro) linear; }
+.app-title { margin: 0; font: 600 var(--fs-title)/var(--lh-title) var(--font-display); letter-spacing: var(--ls-name); color: var(--gold); text-align: center; }
+.app-sub { margin: 0; font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--text-2); text-align: center; }
+
+html[data-layout=wide] .app-head {
+  left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 2 * (var(--panel-w) + 32px));
+  top: calc(var(--paper-top) - 16px - var(--head-h)); height: var(--head-h); flex-direction: column; justify-content: flex-end; gap: 4px;
+}
+html[data-layout=wide] .app-logo { width: 112px; }
+html[data-layout=medium] .app-head, html[data-layout=portrait] .app-head {
+  left: 0; right: 0; top: 0; height: calc(var(--bar-h) + var(--sa-t)); padding: var(--sa-t) max(12px, var(--sa-r)) 0 max(12px, var(--sa-l));
+  gap: var(--space-3); background: var(--bg); border-bottom: 1px solid var(--border); pointer-events: auto;
+}
+html[data-layout=medium] .app-logo, html[data-layout=portrait] .app-logo { width: auto; height: 44px; min-width: 44px; }
+html[data-layout=medium] .app-logo img, html[data-layout=portrait] .app-logo img { width: auto; height: 24px; }
+html[data-layout=medium] .app-title, html[data-layout=portrait] .app-title { font-size: var(--fs-body); text-align: left; }
+html[data-layout=medium] .app-sub, html[data-layout=portrait] .app-sub { display: none; }
+/* альбом: слева сверху название в плашке и рядом кнопка «Все места» (QA v2 B3: на альбоме не было входа в указатель; панель справа та же, что у карточки) */
+html[data-layout=landscape] .app-head { left: max(8px, var(--sa-l)); top: max(8px, var(--sa-t)); gap: var(--space-2); }
+html[data-layout=landscape] .app-title {
+  padding: 6px 14px; background: rgba(var(--bg-rgb), .88); border: 1px solid var(--border); border-radius: var(--r-pill);
+}
+html[data-layout=landscape] .app-logo, html[data-layout=landscape] .app-sub { display: none; }
+html[data-layout=landscape] .app-title { font-size: var(--fs-body); }
+html[data-layout=landscape] .app-head .btn-places { height: 44px; }
+
+/* ---------- нижняя полоса (wide) и рельс ---------- */
+.band, .rail { opacity: 0; visibility: hidden; transition: opacity 400ms var(--ease-out), visibility 0s linear 400ms; display: none; }
+body.chrome-on .band, body.chrome-on .rail { opacity: 1; visibility: visible; transition-delay: 0s; }
+.band {
+  position: fixed; z-index: 20; left: var(--paper-left); width: var(--paper-w); top: calc(var(--paper-top) + var(--paper-h) + 16px); height: var(--band-h);
+  align-items: center; gap: var(--space-4);
+}
+html[data-layout=wide] .band { display: flex; }
+.band .controls { margin-left: auto; }
+.rail { position: fixed; z-index: 25; right: max(var(--rail-gap), var(--sa-r)); }
+html:not([data-layout=wide]) .rail { display: block; }
+html[data-layout=medium] .rail, html[data-layout=portrait] .rail { bottom: calc(var(--peek-h) + var(--sa-b) + var(--rail-gap)); }
+html[data-layout=landscape] .rail { top: 50%; transform: translateY(-50%); }
+body.sheet-up .rail { opacity: 0; visibility: hidden; transition-delay: 0s; }
+
+.btn-places {
+  display: inline-flex; align-items: center; gap: var(--space-2); height: 40px; padding: 8px 14px; margin: 0; cursor: pointer;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line-ctl); border-radius: var(--r-s); font: 400 var(--fs-meta)/1.2 var(--font-body);
+  transition: border-color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+.btn-places:active { transform: translateY(1px); }
+/* счётчик «14» у «Все места» убран: ещё один мелкий кегль, выбрать место он не помогает */
+.count { display: none; }
+
+/* группа кнопок: внешняя рамка бронзой (граница элемента, 4:1), разделители внутри остаются тихими */
+.controls { display: inline-flex; background: var(--surface); border: 1px solid var(--line-ctl); border-radius: var(--r-s); overflow: hidden; }
+.rail .controls { flex-direction: column; }
+.btn-icon-ctl {
+  display: grid; place-items: center; width: 40px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 0; cursor: pointer;
+  background: var(--surface); color: var(--gold); transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+.btn-icon-ctl svg { transition: transform var(--dur-micro) var(--ease-out); }
+.btn-icon-ctl:active:not(:disabled) svg { transform: translateY(1px); }
+.btn-icon-ctl + .btn-icon-ctl { border-left: 1px solid var(--border); }
+.rail .btn-icon-ctl + .btn-icon-ctl { border-left: 0; border-top: 1px solid var(--border); }
+.rail .btn-icon-ctl { width: var(--rail); height: var(--rail); }
+@media (pointer: coarse) { .btn-icon-ctl { width: 44px; height: 44px; } }
+.btn-icon-ctl:disabled { opacity: .4; cursor: default; }
+.btn-icon-ctl:focus-visible { outline-offset: -3px; }
+
+/* ---------- панель (wide, landscape): плавает справа ---------- */
+#panel { position: fixed; z-index: 30; display: flex; flex-direction: column; background: var(--surface); color: var(--text); }
+html[data-layout=wide] #panel, html[data-layout=landscape] #panel {
+  width: var(--panel-w); border: 1px solid var(--border); border-radius: var(--r-m); box-shadow: var(--shadow-panel);
+  transform: translateX(24px); opacity: 0; visibility: hidden;
+  transition: transform 210ms var(--ease-in), opacity 210ms var(--ease-in), visibility 0s linear 210ms;
+}
+html[data-layout=wide] #panel { top: 16px; right: 16px; height: calc(var(--paper-top) + var(--paper-h) - 12px); }
+html[data-layout=landscape] #panel { top: max(8px, var(--sa-t)); bottom: max(8px, var(--sa-b)); right: calc(max(var(--rail-gap), var(--sa-r)) + var(--rail) + var(--rail-gap)); }
+html[data-layout=wide] #panel:not([data-state=closed]), html[data-layout=landscape] #panel:not([data-state=closed]) {
+  transform: none; opacity: 1; visibility: visible;
+  transition: transform 280ms var(--ease-out), opacity 280ms var(--ease-out), visibility 0s;
+}
+html[data-layout=wide] #panel[data-hidden=true]:not([data-state=closed]), html[data-layout=landscape] #panel[data-hidden=true]:not([data-state=closed]) { visibility: visible; }
+html[data-layout=wide] .panel__handle, html[data-layout=landscape] .panel__handle { display: none; }
+
+/* ---------- нижний лист (medium, portrait) ---------- */
+html[data-layout=medium] #panel, html[data-layout=portrait] #panel {
+  left: 0; right: 0; bottom: 0; border-top: 1px solid var(--border); border-radius: var(--r-sheet) var(--r-sheet) 0 0; box-shadow: var(--shadow-panel);
+  overflow: hidden; will-change: transform;
+}
+html[data-layout=medium] #panel[data-hidden=true], html[data-layout=portrait] #panel[data-hidden=true] { visibility: hidden; }
+.panel__handle { position: relative; flex: none; height: 28px; touch-action: none; cursor: grab; }
+.panel__grab { position: absolute; left: 50%; top: 12px; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--border-gold); }
+.peek { display: none; }
+#panel[data-state=peek] .panel__handle { height: calc(var(--peek-h) + var(--sa-b)); }
+#panel[data-state=peek] .peek {
+  display: flex; align-items: center; gap: var(--space-2); position: absolute; inset: 0; width: 100%; padding: 14px var(--space-5) var(--sa-b);
+  background: none; border: 0; color: var(--text); font: 400 var(--fs-body)/1.2 var(--font-body); text-align: left; cursor: pointer;
+}
+.peek__chev { margin-left: auto; color: var(--gold); display: inline-flex; }
+/* В состоянии half ярлык остаётся прозрачной кнопкой на всю ручку: тап по ручке сворачивает указатель в peek (ТЗ 5.5, QA v2 B2), как и свайп вниз.
+   Подпись «Все места» у кнопки есть для скринридера, глазом видна только ручка. Зона 44 px по высоте. */
+#panel[data-state=half] .panel__handle { height: 44px; }
+#panel[data-state=half] .peek {
+  display: block; position: absolute; inset: 0; width: 100%; padding: 0; background: none; border: 0; cursor: pointer;
+  color: var(--text); font: 400 var(--fs-body)/1.2 var(--font-body);   /* стиль подписи тот же, что у ярлыка в peek: скрытый текст не вводит ни нового кегля, ни низкого контраста */
+}
+#panel[data-state=half] .peek > * { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#panel[data-state=half] .peek:focus-visible { outline-offset: -3px; }
+
+/* Прокрутка указателя и карточки: текст растворяется у нижнего края, пока ниже есть что читать.
+   Нижнее поле больше полосы растворения, поэтому в конце прокрутки последняя строка видна целиком. */
+#index, #card {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; scrollbar-color: var(--border-gold) transparent;
+  padding: 0 var(--space-5) calc(var(--fade) + var(--space-2) + var(--sa-b));
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+          mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+}
+html[data-layout=wide] #index, html[data-layout=wide] #card { padding: var(--space-6) var(--space-6) calc(var(--fade) + var(--space-2)); }
+html[data-layout=landscape] #index, html[data-layout=landscape] #card { padding: var(--space-5) var(--space-5) calc(var(--fade) + var(--space-2)); }
+/* ряд «Закрыть» прилипает к самому верху панели: раньше над ним оставалось поле, и сквозь него просвечивал прокрученный текст */
+html[data-layout=wide] #card, html[data-layout=landscape] #card { padding-top: 0; }
+
+/* нижний лист на планшете: не шире удобной строки, карта видна по бокам */
+@media (min-width: 40rem) {
+  html[data-layout=medium] #panel, html[data-layout=portrait] #panel {
+    max-width: 600px; margin-inline: auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  }
+}
+#panel[data-view=index] #card, #panel[data-view=place] #index { display: none; }
+#panel[data-state=peek] #index, #panel[data-state=closed] #index { visibility: hidden; }
+
+/* указатель мест */
+/* заголовок указателя не имя места, поэтому Spectral кеглем текста; от пунктов его отличает золото */
+#index-title { margin: 0 0 var(--space-1); font: 400 var(--fs-body)/1.3 var(--font-body); color: var(--gold); }
+#index-title:focus { outline: none; }
+.index-lead { margin: 0 0 var(--space-5); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--text-2); }
+.index-group + .index-group { margin-top: var(--space-5); }
+.index-group h3 { margin: 0 0 var(--space-1); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--muted); }
+.index-group ul { list-style: none; margin: 0; padding: 0; }
+.index-item {
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; width: calc(100% + 2 * var(--space-3)); min-height: 52px; padding: 8px var(--space-3); margin: 0 calc(var(--space-3) * -1);
+  background: none; border: 0; border-bottom: 1px solid var(--border); color: var(--text); text-align: left; cursor: pointer;
+}
+.index-group li:last-child .index-item { border-bottom: 0; }
+.index-item:focus-visible { background: var(--surface-2); outline-offset: -2px; }
+.index-item__name { font: 400 var(--fs-body)/1.3 var(--font-body); }
+.index-item__type { font: 400 var(--fs-meta)/1.3 var(--font-body); color: var(--muted); }
+.index-foot { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); align-items: center; margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+html[data-layout=wide] .index-foot .link-quiet { display: none; }
+
+/* карточка места */
+.card__bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin: 0 calc(var(--space-2) * -1); padding: 0; background: var(--surface); touch-action: none; }
+/* мягкая тень-растворение под прилипшим рядом: прокрученный текст уходит под него, а не обрывается о край */
+.card__bar::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: var(--space-3); pointer-events: none;
+  background: linear-gradient(var(--surface), rgba(var(--surface-rgb), 0));
+}
+html[data-layout=wide] .card__bar { padding-top: var(--space-4); }
+html[data-layout=landscape] .card__bar { padding-top: var(--space-3); }
+.card__bar-gap { flex: 1; }
+#card-title { overflow-wrap: anywhere; margin: var(--space-3) 0 0; font: 600 var(--fs-title)/var(--lh-title) var(--font-display); letter-spacing: var(--ls-name); color: var(--gold); }
+#card-title:focus { outline: none; }
+/* тип, статус и правитель: один блок справки одним кеглем, различаются только цветом */
+#card-type { margin: var(--space-2) 0 0; font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--text-2); }
+#card-status { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-1) 0 0; font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--muted); }
+/* ромбик перед статусом убран: декоративная точка, смысла не добавляет */
+.diamond { display: none; }
+/* «Правит…» это справка рядом с типом, а не начало рассказа: тон второго плана, чтобы первым читался абзац */
+#card-ruler { margin: var(--space-1) 0 0; font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--text-2); }
+#card-text { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+#card-text p { overflow-wrap: anywhere; margin: 0 0 var(--space-3); font: 400 var(--fs-body)/var(--lh-body) var(--font-body); color: var(--text); }
+#card-text p:last-child { margin-bottom: 0; }
+.pill {
+  display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-5); padding: 10px 18px; border: 1px solid var(--gold); border-radius: var(--r-pill);
+  color: var(--gold); font: 400 var(--fs-body)/1.2 var(--font-body); text-decoration: none; transition: background-color var(--dur-micro) var(--ease-out);
+}
+.pill:active { transform: translateY(1px); }
+#card-related { margin-top: var(--space-6); }
+#card-related h3 { margin: 0 0 var(--space-1); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--muted); }
+#card-related ul { list-style: none; margin: 0; padding: 0; }
+#card-related li { border-bottom: 1px solid var(--border); }
+#card-related li:last-child { border-bottom: 0; }
+#card-related a { display: flex; align-items: center; min-height: 40px; padding: 6px 0; color: var(--gold); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); text-decoration: none; }
+.btn-share { margin: var(--space-5) 0 0 calc(var(--space-2) * -1); }
+.card__copyfail { margin-top: var(--space-3); }
+.card__copyfail label { display: block; margin-bottom: var(--space-1); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); color: var(--muted); }
+.card__copyfail input { width: 100%; padding: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-s); font: 400 var(--fs-meta)/1.3 var(--font-body); }
+#card { transition: opacity 75ms linear; }
+#card.is-swapping { opacity: 0; }
+@media (pointer: coarse) { .btn-text, .link-quiet { min-height: 44px; } #card-related a { min-height: 44px; } .btn-places { height: 44px; } }
+
+/* ---------- подсказка над местом ---------- */
+#tip {
+  position: fixed; left: 0; top: 0; z-index: 40; display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; pointer-events: none; white-space: nowrap;
+  background: var(--surface); border: 1px solid var(--border-gold); border-radius: var(--r-s); box-shadow: var(--shadow-tip);
+  visibility: hidden; opacity: 0;
+}
+#tip.on { visibility: visible; opacity: 1; transition: opacity 120ms linear; }
+.tip__name { font: 600 var(--fs-body)/1.2 var(--font-display); letter-spacing: var(--ls-name); color: var(--gold-bright); }
+.tip__type { font: 400 var(--fs-meta)/1.3 var(--font-body); color: var(--text-2); }
+
+/* ---------- подсказка первого визита, сообщения, загрузка ---------- */
+#coach, #toast, .loading {
+  /* width: max-content: при left: 50% ширина по содержимому иначе упирается в половину экрана, и строка ломалась раньше max-width */
+  position: fixed; z-index: 35; left: 50%; width: max-content; padding: 8px 16px; background: rgba(var(--bg-rgb), .9); border: 1px solid var(--border); border-radius: var(--r-bubble);
+  color: var(--text-2); font: 400 var(--fs-meta)/var(--lh-meta) var(--font-body); text-align: center; text-wrap: balance; pointer-events: none;
+}
+#coach, #toast { opacity: 0; transform: translateX(-50%); transition: opacity var(--dur-short) var(--ease-out); }
+#coach.on, #toast.on { opacity: 1; }
+#toast.is-error { border-color: var(--rust); }
+/* на десктопе подсказка в одну строку: раньше 560 px делили её на две и раздували в «стадион» над картой */
+html[data-layout=wide] #coach { top: auto; bottom: calc(100vh - var(--paper-top) - var(--paper-h) - 8px); max-width: min(760px, calc(var(--paper-w) - 64px)); }
+/* телефон: блок слева от рельса во всю свободную ширину, текст по левому краю (было пять строк по центру поверх карты) */
+html[data-layout=medium] #coach, html[data-layout=portrait] #coach {
+  left: max(var(--space-4), var(--sa-l)); right: calc(var(--rail) + var(--rail-gap) * 2 + var(--sa-r)); transform: none; width: auto;
+  bottom: calc(var(--peek-h) + var(--sa-b) + var(--rail-gap)); max-width: none; text-align: left; text-wrap: pretty;
+}
+@media (min-width: 40rem) {
+  html[data-layout=medium] #coach, html[data-layout=portrait] #coach {
+    left: 50%; right: auto; transform: translateX(-50%); width: max-content; max-width: min(600px, calc(100vw - 2 * (var(--rail) + var(--rail-gap) * 2 + 8px))); text-align: center; text-wrap: balance;
+  }
+}
+html[data-layout=landscape] #coach { bottom: max(16px, var(--sa-b)); max-width: calc(100vw - 2 * (var(--rail) + var(--rail-gap) * 2 + 8px)); }
+#toast { top: calc(var(--paper-top) - 16px + 8px); max-width: min(520px, calc(100vw - 2 * (var(--panel-w) + 32px))); }
+html[data-layout=medium] #toast, html[data-layout=portrait] #toast { top: calc(var(--bar-h) + var(--sa-t) + 8px); max-width: calc(100vw - 32px); }
+html[data-layout=landscape] #toast {
+  top: calc(max(8px, var(--sa-t)) + 48px); left: calc((100vw - var(--panel-w) - var(--rail) - var(--rail-gap) * 3) / 2);
+  max-width: calc(100vw - var(--panel-w) - var(--rail) - var(--rail-gap) * 3 - 24px);
+}
+html[data-layout=wide] #toast { top: calc(var(--paper-top) + 8px); }
+.loading { bottom: max(24px, var(--sa-b)); transform: translateX(-50%); color: var(--text-2); }
+.loading[hidden] { display: none; }
+
+/* ---------- reduced motion: сразу конечное состояние, всё пространственное заменяется проявлением 150 мс ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .rise, .settle { animation: none !important; opacity: 0; transition: opacity 150ms linear; }
+  .ready .rise, .ready .settle { opacity: 1; transform: none; }
+  .app-head, .band, .rail { transition-duration: 150ms, 0s; transition-delay: 0s, 150ms; }
+  body.head-on .app-head, body.chrome-on .band, body.chrome-on .rail { transition-delay: 0s; }
+  html[data-layout=wide] #panel, html[data-layout=landscape] #panel { transform: none; transition: opacity 150ms linear, visibility 0s linear 150ms; }
+  html[data-layout=wide] #panel:not([data-state=closed]), html[data-layout=landscape] #panel:not([data-state=closed]) { transition: opacity 150ms linear, visibility 0s; }
+  #card, #coach.on, #toast.on, #tip.on { transition-duration: 150ms; }
+}
+
+/* наведение мышью: на экранах без hover подсветка после тапа не залипает */
+@media (hover: hover) {
+  .link-quiet:hover { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .btn-text:hover { color: var(--gold); }
+  .app-logo:hover img { opacity: .85; }
+  .btn-places:hover { border-color: var(--gold); background-color: var(--surface-2); }
+  /* один сигнал наведения: светлее фон и значок, без второй рамки внутри группы */
+  .btn-icon-ctl:hover:not(:disabled) { background-color: var(--surface-2); color: var(--gold-bright); }
+  .index-item:hover { background: var(--surface-2); }
+  .pill:hover { background: rgba(var(--gold-rgb), .08); }
+  #card-related a:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
